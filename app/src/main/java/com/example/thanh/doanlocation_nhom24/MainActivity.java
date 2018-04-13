@@ -1,5 +1,6 @@
-package com.example.thanh.doanloacation_nhom24;
+package com.example.thanh.doanlocation_nhom24;
 
+import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.CardView;
@@ -85,7 +86,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         switch (id) {
             case R.id.cvAtm:
             {
-                Toast.makeText(this, "cvATM", Toast.LENGTH_SHORT).show();
+                Intent intent = new Intent(MainActivity.this,Map_Activity.class);
+                startActivity(intent);
             }
             break;
             case R.id.cvCafe:

@@ -3,7 +3,7 @@ apply plugin: 'com.android.application'
 android {
     compileSdkVersion 26
     defaultConfig {
-        applicationId "com.example.thanh.doanloacation_nhom24"
+        applicationId "com.example.thanh.doanlocation_nhom24"
         minSdkVersion 15
         targetSdkVersion 26
         versionCode 1
@@ -31,4 +31,7 @@ dependencies {
     compile 'com.android.support:cardview-v7:25.1.0'
     //noinspection GradleCompatible
     compile 'com.android.support:recyclerview-v7:25.1.0'
+    //Add thư viện google play service
+    compile 'com.google.android.gms:play-services-maps:7.8.0'
+    compile 'com.google.android.gms:play-services-location:7.8.0'
 }

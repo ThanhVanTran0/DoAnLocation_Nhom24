@@ -1,4 +1,4 @@
-package com.example.thanh.doanloacation_nhom24;
+package com.example.thanh.doanlocation_nhom24;
 
 import android.content.Context;
 import android.support.test.InstrumentationRegistry;
@@ -21,6 +21,6 @@ public class ExampleInstrumentedTest {
         // Context of the app under test.
         Context appContext = InstrumentationRegistry.getTargetContext();
 
-        assertEquals("com.example.thanh.doanloacation_nhom24", appContext.getPackageName());
+        assertEquals("com.example.thanh.doanlocation_nhom24", appContext.getPackageName());
     }
 }

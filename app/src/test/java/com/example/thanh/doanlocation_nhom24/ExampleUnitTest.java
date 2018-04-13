@@ -1,4 +1,4 @@
-package com.example.thanh.doanloacation_nhom24;
+package com.example.thanh.doanlocation_nhom24;
 
 import org.junit.Test;
 
