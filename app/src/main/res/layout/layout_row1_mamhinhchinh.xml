@@ -9,6 +9,7 @@
     >
 
     <android.support.v7.widget.CardView
+        android:id="@+id/cvRestaurant"
         android:layout_height="@dimen/cardViewHeight"
         android:layout_width="@dimen/cardViewWidth"
         android:foreground="?android:attr/selectableItemBackground"
@@ -45,6 +46,7 @@
     </android.support.v7.widget.CardView>
 
     <android.support.v7.widget.CardView
+        android:id="@+id/cvHospital"
         android:layout_height="@dimen/cardViewHeight"
         android:layout_width="@dimen/cardViewWidth"
         android:foreground="?android:attr/selectableItemBackground"
@@ -81,6 +83,7 @@
     </android.support.v7.widget.CardView>
 
     <android.support.v7.widget.CardView
+        android:id="@+id/cvAtm"
         android:layout_height="@dimen/cardViewHeight"
         android:layout_width="@dimen/cardViewWidth"
         android:foreground="?android:attr/selectableItemBackground"

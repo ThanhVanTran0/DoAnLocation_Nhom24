@@ -9,6 +9,7 @@
     >
 
     <android.support.v7.widget.CardView
+        android:id="@+id/cvCafe"
         android:layout_height="@dimen/cardViewHeight"
         android:layout_width="@dimen/cardViewWidth"
         android:foreground="?android:attr/selectableItemBackground"
@@ -45,6 +46,7 @@
     </android.support.v7.widget.CardView>
 
     <android.support.v7.widget.CardView
+        android:id="@+id/cvPark"
         android:layout_height="@dimen/cardViewHeight"
         android:layout_width="@dimen/cardViewWidth"
         android:foreground="?android:attr/selectableItemBackground"
@@ -81,6 +83,7 @@
     </android.support.v7.widget.CardView>
 
     <android.support.v7.widget.CardView
+        android:id="@+id/cvGasStation"
         android:layout_height="@dimen/cardViewHeight"
         android:layout_width="@dimen/cardViewWidth"
         android:foreground="?android:attr/selectableItemBackground"
@@ -98,7 +101,7 @@
             <ImageView
                 android:layout_width="@dimen/imgCardViewWidth"
                 android:layout_height="@dimen/imgCardViewHeight"
-                android:src="@drawable/restaurant"
+                android:src="@drawable/gastation"
                 android:padding="10dp"
                 android:background="@drawable/cricle_background"
                 />
