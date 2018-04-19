@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:showIn="navigation_view"
+    >
+
+    <group android:checkableBehavior="single"
+        android:id="@+id/group1"
+        >
+        <item android:id="@+id/home"
+            android:title="@string/home"
+            />
+        <item android:id="@+id/location"
+            android:title="@string/location"/>
+
+        <item android:id="@+id/idea"
+            android:title="@string/y_tuong"/>
+    </group>
+
+    <group android:checkableBehavior="none"
+        android:id="@+id/group2"
+        >
+            <item android:id="@+id/danhgia"
+                android:title="@string/danh_gia"/>
+
+            <item android:id="@+id/phanhoi"
+                android:title="@string/phan_hoi"/>
+
+            <item android:id="@+id/thongtin"
+                android:title="@string/thong_tin"/>
+    </group>
+</menu>
