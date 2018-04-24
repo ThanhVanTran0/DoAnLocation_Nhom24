@@ -1,6 +1,8 @@
 package com.example.thanh.doanlocation_nhom24;
 
 import android.content.Intent;
+import android.support.v4.widget.DrawerLayout;
+import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.CardView;
@@ -11,11 +13,15 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.Toast;
 
+import com.miguelcatalan.materialsearchview.MaterialSearchView;
+
 //Activity Trang chu
 public class MainActivity extends AppCompatActivity implements View.OnClickListener {
+    private DrawerLayout drawerLayout;
+    private ActionBarDrawerToggle mToggle;
+    private android.support.v7.widget.Toolbar map_toolbar;
+    private MaterialSearchView searchView;
 
-    private CardView cvRestaurant,cvCafe,cvHospital,cvPark,cvAtm,cvGasStation;
-    private Toolbar toolbar;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -24,87 +30,66 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         AnhXa();
         ThemSuKien();
 
-        toolbar.setTitle("Nhóm 24");
-        setSupportActionBar(toolbar);
-
-        if(getSupportActionBar()!=null) {
-            getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        }
     }
 
     private void ThemSuKien() {
-        cvGasStation.setOnClickListener(this);
-        cvCafe.setOnClickListener(this);
-        cvPark.setOnClickListener(this);
-        cvHospital.setOnClickListener(this);
-        cvRestaurant.setOnClickListener(this);
-        cvAtm.setOnClickListener(this);
-    }
+        //Add toolbar
+        setSupportActionBar(map_toolbar);
 
-    private void AnhXa() {
-        toolbar =(Toolbar) findViewById(R.id.toolBarTrangChu);
-        cvRestaurant = (CardView) findViewById(R.id.cvRestaurant);
-        cvCafe = (CardView) findViewById(R.id.cvCafe);
-        cvHospital = (CardView) findViewById(R.id.cvHospital);
-        cvPark = (CardView) findViewById(R.id.cvPark);
-        cvAtm = (CardView) findViewById(R.id.cvAtm);
-        cvGasStation = (CardView) findViewById(R.id.cvGasStation);
-    }
+        //Add Nav drawer
+        mToggle = new ActionBarDrawerToggle(this,drawerLayout,R.string.open,R.string.close);
+        drawerLayout.addDrawerListener(mToggle);
+        mToggle.syncState();
+        if(getSupportActionBar()!=null) {
+            getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        }
 
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.menu_trangchu,menu);
-
-        MenuItem searchview = menu.findItem(R.id.itSearch);
-        SearchView search = (SearchView) searchview.getActionView();
-
-        search.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+//        Search view
+        searchView.setSuggestions(getResources().getStringArray(R.array.query_suggestions));
+        searchView.setOnQueryTextListener(new MaterialSearchView.OnQueryTextListener() {
             @Override
             public boolean onQueryTextSubmit(String query) {
-                Toast.makeText(MainActivity.this,query, Toast.LENGTH_SHORT).show();
+                Toast.makeText(MainActivity.this,"Moi submit: " + query,Toast.LENGTH_LONG).show();
                 return false;
             }
 
             @Override
             public boolean onQueryTextChange(String newText) {
+                //Do something
                 return false;
             }
         });
+    }
+
+    private void AnhXa() {
+
+        map_toolbar = (android.support.v7.widget.Toolbar) findViewById(R.id.toolBar);
+        //Add Material Search
+        searchView =(MaterialSearchView) findViewById(R.id.search_view);
+
+        drawerLayout = (DrawerLayout) findViewById(R.id.drawer);
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.menu_trangchu,menu);
+        MenuItem item = menu.findItem(R.id.map_search);
+        searchView.setMenuItem(item);
 
         return super.onCreateOptionsMenu(menu);
     }
 
-    //Bắt sự kiện click item menu
     @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        return super.onOptionsItemSelected(item);
+    public void onClick(View view) {
+
     }
 
     @Override
-    public void onClick(View view) {
-        int id = view.getId();
-        switch (id) {
-            case R.id.cvAtm:
-            {
-                Intent intent = new Intent(MainActivity.this,Map_Activity.class);
-                startActivity(intent);
-            }
-            break;
-            case R.id.cvCafe:
-                Toast.makeText(this, "cvCafe", Toast.LENGTH_SHORT).show();
-                break;
-            case R.id.cvGasStation:
-                Toast.makeText(this, "cvGas", Toast.LENGTH_SHORT).show();
-                break;
-            case R.id.cvHospital:
-                Toast.makeText(this, "cvHospital", Toast.LENGTH_SHORT).show();
-                break;
-            case R.id.cvPark:
-                Toast.makeText(this, "cvPark", Toast.LENGTH_SHORT).show();
-                break;
-            case R.id.cvRestaurant:
-                Toast.makeText(this, "cvRestaurant", Toast.LENGTH_SHORT).show();
-                break;
+    public void onBackPressed() {
+        if(searchView.isSearchOpen())
+            searchView.closeSearch();
+        else {
+            super.onBackPressed();
         }
     }
 }

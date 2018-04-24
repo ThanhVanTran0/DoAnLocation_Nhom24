@@ -13,4 +13,8 @@
     <dimen name="nav_header_height">176dp</dimen>
     <dimen name="fab_margin">16dp</dimen>
 
+    <!-- Tool bar map-->
+    <dimen name="toolbar_map_margin_top">8dp</dimen>
+    <dimen name="toolbar_map_margin_left_right">10dp</dimen>
+
 </resources>
