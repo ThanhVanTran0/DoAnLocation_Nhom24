@@ -1,20 +1,23 @@
 package com.example.thanh.doanlocation_nhom24;
 
+import android.app.Dialog;
 import android.content.Intent;
 import android.support.annotation.NonNull;
 import android.support.design.widget.NavigationView;
+import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.support.v7.widget.CardView;
-import android.support.v7.widget.SearchView;
-import android.support.v7.widget.Toolbar;
+import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.Window;
+import android.widget.Button;
 import android.widget.Toast;
 
+import com.github.clans.fab.FloatingActionMenu;
 import com.miguelcatalan.materialsearchview.MaterialSearchView;
 
 //Activity Trang chu
@@ -24,6 +27,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private android.support.v7.widget.Toolbar toolbar;
     private MaterialSearchView searchView;
     private NavigationView navigationView;
+    private FloatingActionMenu floatingActionMenu;
+    private com.github.clans.fab.FloatingActionButton fBtnTimDuong, fBtnThemDiaDiem;
+    private Dialog dialog;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -61,6 +67,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         });
 
         navigationView.setNavigationItemSelectedListener(this);
+        fBtnTimDuong.setOnClickListener(this);
+        fBtnThemDiaDiem.setOnClickListener(this);
     }
 
     private void AnhXa() {
@@ -74,6 +82,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
         drawerLayout = (DrawerLayout) findViewById(R.id.drawer);
         navigationView = findViewById(R.id.navView);
+
+        floatingActionMenu = (FloatingActionMenu) findViewById(R.id.fabMenu);
+        fBtnThemDiaDiem = floatingActionMenu.findViewById(R.id.fabBtnThemDiaDiem);
+        fBtnTimDuong =  floatingActionMenu.findViewById(R.id.fabBtnTimDuong);
     }
 
     @Override
@@ -87,11 +99,21 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     @Override
     public void onClick(View view) {
-
+        int id = view.getId();
+        switch (id) {
+            case R.id.btnQuayLai:
+            {
+                dialog.dismiss();
+            }
+            break;
+        }
     }
 
     @Override
     public void onBackPressed() {
+        if(this.drawerLayout.isDrawerOpen(GravityCompat.START)){
+            this.drawerLayout.closeDrawer(GravityCompat.START);
+        }
         if(searchView.isSearchOpen())
             searchView.closeSearch();
         else {
@@ -111,6 +133,23 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     @Override
     public boolean onNavigationItemSelected(@NonNull MenuItem item) {
         int id = item.getItemId();
+        switch (id) {
+            case R.id.navThongtin:
+            {
+                this.drawerLayout.closeDrawer(GravityCompat.START);
+                CustomDialog();
+            }
+            break;
+        }
         return false;
+    }
+
+    private void CustomDialog() {
+        dialog = new Dialog(this);
+        dialog.setContentView(R.layout.thongtin_dialog_custom);
+        dialog.setCanceledOnTouchOutside(false);
+        Button btnQuayLai = (Button) dialog.findViewById(R.id.btnQuayLai);
+        btnQuayLai.setOnClickListener(MainActivity.this);
+        dialog.show();
     }
 }

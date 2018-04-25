@@ -11,19 +11,19 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
-        <fragment
-            android:id="@+id/map"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            tools:context=".MapsActivity"
-            android:name="com.google.android.gms.maps.MapFragment"
-            />
+        <!--<fragment-->
+            <!--android:id="@+id/map"-->
+            <!--android:layout_width="match_parent"-->
+            <!--android:layout_height="match_parent"-->
+            <!--tools:context=".MapsActivity"-->
+            <!--android:name="com.google.android.gms.maps.MapFragment"-->
+            <!--/>-->
 
         <android.support.v7.widget.Toolbar
             android:id="@+id/toolBar"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:background="?attr/colorPrimary"
+            android:background="@color/colorBackgroud"
             >
         </android.support.v7.widget.Toolbar>
 
@@ -35,7 +35,7 @@
         </com.miguelcatalan.materialsearchview.MaterialSearchView>
 
         <com.github.clans.fab.FloatingActionMenu
-            android:id="@+id/fab"
+            android:id="@+id/fabMenu"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="bottom|right"
@@ -45,16 +45,49 @@
             app:menu_fab_label=""
             app:menu_openDirection="up"
             app:menu_backgroundColor="@android:color/transparent"
+            app:menu_labels_textColor="@color/texxtColor"
+            app:menu_labels_colorNormal="@color/colorBackgroud"
+            app:menu_colorNormal="@color/colorBackgroud"
+            app:menu_colorPressed="@color/colorMenuPress"
             >
 
             <com.github.clans.fab.FloatingActionButton
                 android:layout_height="wrap_content"
                 android:layout_width="wrap_content"
                 app:fab_label="Tìm Đường"
-                android:id="@+id/floatingBtnTimDuong"
+                android:id="@+id/fabBtnTimDuong"
                 android:src="@drawable/ic_navigation_black_24dp"
+                app:fab_colorNormal="@color/colorBackgroud"
+                app:fab_colorPressed="@color/colorMenuPress"
+                app:fab_showShadow="true"
+                app:fab_shadowColor="#66000000"
+                app:fab_shadowRadius="4dp"
+                app:fab_shadowXOffset="1dp"
+                app:fab_shadowYOffset="3dp"
+                app:fab_size="normal"
+                app:fab_showAnimation="@anim/fab_scale_up"
+                app:fab_hideAnimation="@anim/fab_scale_down"
                 >
+            </com.github.clans.fab.FloatingActionButton>
 
+
+            <com.github.clans.fab.FloatingActionButton
+                android:layout_height="wrap_content"
+                android:layout_width="wrap_content"
+                app:fab_label="Thêm địa điểm của bạn"
+                android:id="@+id/fabBtnThemDiaDiem"
+                android:src="@drawable/ic_add_location"
+                app:fab_colorNormal="@color/colorBackgroud"
+                app:fab_colorPressed="@color/colorMenuPress"
+                app:fab_showShadow="true"
+                app:fab_shadowColor="#66000000"
+                app:fab_shadowRadius="4dp"
+                app:fab_shadowXOffset="1dp"
+                app:fab_shadowYOffset="3dp"
+                app:fab_size="normal"
+                app:fab_showAnimation="@anim/fab_scale_up"
+                app:fab_hideAnimation="@anim/fab_scale_down"
+                >
             </com.github.clans.fab.FloatingActionButton>
 
         </com.github.clans.fab.FloatingActionMenu>
