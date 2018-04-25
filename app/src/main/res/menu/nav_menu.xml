@@ -7,16 +7,12 @@
     <group android:checkableBehavior="single"
         android:id="@+id/group1"
         >
-        <item android:id="@+id/home"
-            android:title="@string/home"
-            android:icon="@drawable/ic_home"
-            />
-        <item android:id="@+id/location"
+        <item android:id="@+id/naLlocation"
             android:title="@string/location"
             android:icon="@drawable/ic_location"
             />
 
-        <item android:id="@+id/idea"
+        <item android:id="@+id/navIdea"
             android:title="@string/y_tuong"
             android:icon="@drawable/ic_idea"
             />
@@ -25,13 +21,13 @@
     <group android:checkableBehavior="none"
         android:id="@+id/group2"
         >
-            <item android:id="@+id/danhgia"
+            <item android:id="@+id/navDanhgia"
                 android:title="@string/danh_gia"/>
 
-            <item android:id="@+id/phanhoi"
+            <item android:id="@+id/navPhanhoi"
                 android:title="@string/phan_hoi"/>
 
-            <item android:id="@+id/thongtin"
+            <item android:id="@+id/navThongtin"
                 android:title="@string/thong_tin"/>
     </group>
 </menu>

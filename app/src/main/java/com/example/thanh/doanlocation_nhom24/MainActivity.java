@@ -1,6 +1,8 @@
 package com.example.thanh.doanlocation_nhom24;
 
 import android.content.Intent;
+import android.support.annotation.NonNull;
+import android.support.design.widget.NavigationView;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
@@ -16,11 +18,12 @@ import android.widget.Toast;
 import com.miguelcatalan.materialsearchview.MaterialSearchView;
 
 //Activity Trang chu
-public class MainActivity extends AppCompatActivity implements View.OnClickListener {
+public class MainActivity extends AppCompatActivity implements View.OnClickListener,NavigationView.OnNavigationItemSelectedListener {
     private DrawerLayout drawerLayout;
     private ActionBarDrawerToggle mToggle;
-    private android.support.v7.widget.Toolbar map_toolbar;
+    private android.support.v7.widget.Toolbar toolbar;
     private MaterialSearchView searchView;
+    private NavigationView navigationView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -33,9 +36,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     }
 
     private void ThemSuKien() {
-        //Add toolbar
-        setSupportActionBar(map_toolbar);
-
         //Add Nav drawer
         mToggle = new ActionBarDrawerToggle(this,drawerLayout,R.string.open,R.string.close);
         drawerLayout.addDrawerListener(mToggle);
@@ -44,7 +44,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         }
 
-//        Search view
+//      Search view
         searchView.setSuggestions(getResources().getStringArray(R.array.query_suggestions));
         searchView.setOnQueryTextListener(new MaterialSearchView.OnQueryTextListener() {
             @Override
@@ -59,15 +59,21 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 return false;
             }
         });
+
+        navigationView.setNavigationItemSelectedListener(this);
     }
 
     private void AnhXa() {
+        //Add toolbar
+        toolbar = (android.support.v7.widget.Toolbar) findViewById(R.id.toolBar);
+        toolbar.setTitle("");
+        setSupportActionBar(toolbar);
 
-        map_toolbar = (android.support.v7.widget.Toolbar) findViewById(R.id.toolBar);
         //Add Material Search
         searchView =(MaterialSearchView) findViewById(R.id.search_view);
 
         drawerLayout = (DrawerLayout) findViewById(R.id.drawer);
+        navigationView = findViewById(R.id.navView);
     }
 
     @Override
@@ -91,5 +97,20 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         else {
             super.onBackPressed();
         }
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        if(mToggle.onOptionsItemSelected(item)) {
+
+            return true;
+        }
+        return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    public boolean onNavigationItemSelected(@NonNull MenuItem item) {
+        int id = item.getItemId();
+        return false;
     }
 }
