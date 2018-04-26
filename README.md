@@ -1,2 +1,0 @@
-# DoAnLocation_Nhom24
-DoAn_Location_Nhom24
