@@ -83,7 +83,7 @@ public class MainActivity extends BaseActivity implements View.OnClickListener,N
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.menu_trangchu,menu);
-        MenuItem item = menu.findItem(R.id.map_search);
+        MenuItem item = menu.findItem(R.id.itsearch);
         searchView.setMenuItem(item);
 
         return super.onCreateOptionsMenu(menu);
@@ -128,11 +128,17 @@ public class MainActivity extends BaseActivity implements View.OnClickListener,N
         switch (id) {
             case R.id.navThongtin:
             {
-                this.drawerLayout.closeDrawer(GravityCompat.START);
                 CustomDialog();
             }
             break;
+            case R.id.navPhanhoi:
+            {
+                Intent intent = new Intent(MainActivity.this,PhanHoiActivity.class);
+                startActivity(intent);
+            }
+            break;
         }
+        this.drawerLayout.closeDrawer(GravityCompat.START);
         return false;
     }
 
