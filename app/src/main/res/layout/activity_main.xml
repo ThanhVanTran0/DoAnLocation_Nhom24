@@ -19,13 +19,7 @@
             <!--android:name="com.google.android.gms.maps.MapFragment"-->
             <!--/>-->
 
-        <android.support.v7.widget.Toolbar
-            android:id="@+id/toolBar"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:background="@color/colorBackgroud"
-            >
-        </android.support.v7.widget.Toolbar>
+        <include layout="@layout/my_toolbar"/>
 
         <com.miguelcatalan.materialsearchview.MaterialSearchView
             android:id="@+id/search_view"

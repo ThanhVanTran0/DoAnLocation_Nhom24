@@ -21,20 +21,20 @@ import com.github.clans.fab.FloatingActionMenu;
 import com.miguelcatalan.materialsearchview.MaterialSearchView;
 
 //Activity Trang chu
-public class MainActivity extends AppCompatActivity implements View.OnClickListener,NavigationView.OnNavigationItemSelectedListener {
+public class MainActivity extends BaseActivity implements View.OnClickListener,NavigationView.OnNavigationItemSelectedListener {
     private DrawerLayout drawerLayout;
     private ActionBarDrawerToggle mToggle;
-    private android.support.v7.widget.Toolbar toolbar;
     private MaterialSearchView searchView;
     private NavigationView navigationView;
     private FloatingActionMenu floatingActionMenu;
     private com.github.clans.fab.FloatingActionButton fBtnTimDuong, fBtnThemDiaDiem;
     private Dialog dialog;
 
-    @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        inItToolBar();
 
         AnhXa();
         ThemSuKien();
@@ -46,9 +46,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         mToggle = new ActionBarDrawerToggle(this,drawerLayout,R.string.open,R.string.close);
         drawerLayout.addDrawerListener(mToggle);
         mToggle.syncState();
-        if(getSupportActionBar()!=null) {
-            getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        }
 
 //      Search view
         searchView.setSuggestions(getResources().getStringArray(R.array.query_suggestions));
@@ -72,11 +69,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     }
 
     private void AnhXa() {
-        //Add toolbar
-        toolbar = (android.support.v7.widget.Toolbar) findViewById(R.id.toolBar);
-        toolbar.setTitle("");
-        setSupportActionBar(toolbar);
-
         //Add Material Search
         searchView =(MaterialSearchView) findViewById(R.id.search_view);
 
