@@ -34,7 +34,7 @@ public class MainActivity extends BaseActivity implements View.OnClickListener,N
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        inItToolBar();
+        inItToolBar("");
 
         AnhXa();
         ThemSuKien();
@@ -134,6 +134,12 @@ public class MainActivity extends BaseActivity implements View.OnClickListener,N
             case R.id.navPhanhoi:
             {
                 Intent intent = new Intent(MainActivity.this,PhanHoiActivity.class);
+                startActivity(intent);
+            }
+            break;
+            case R.id.navLocation:
+            {
+                Intent intent = new Intent(MainActivity.this,DiaDiemCuaBanActivity.class);
                 startActivity(intent);
             }
             break;

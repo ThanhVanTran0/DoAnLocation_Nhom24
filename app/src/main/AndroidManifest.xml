@@ -32,7 +32,8 @@
             android:name="com.google.android.geo.API_KEY"
             android:value="AIzaSyD73ix-2OxsdM03JnoTj5gbxwbPRAJZSiM" />
 
-        <activity android:name=".PhanHoiActivity"></activity>
+        <activity android:name=".PhanHoiActivity" />
+        <activity android:name=".DiaDiemCuaBanActivity"></activity>
     </application>
 
 </manifest>
