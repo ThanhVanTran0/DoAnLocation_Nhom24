@@ -7,21 +7,25 @@ import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.Window;
 import android.widget.Button;
 import android.widget.Toast;
 
 import com.github.clans.fab.FloatingActionMenu;
+import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.maps.CameraUpdateFactory;
+import com.google.android.gms.maps.GoogleMap;
+import com.google.android.gms.maps.MapFragment;
+import com.google.android.gms.maps.OnMapReadyCallback;
+import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.MarkerOptions;
 import com.miguelcatalan.materialsearchview.MaterialSearchView;
 
 //Activity Trang chu
-public class MainActivity extends BaseActivity implements View.OnClickListener,NavigationView.OnNavigationItemSelectedListener {
+public class MainActivity extends BaseActivity implements View.OnClickListener,NavigationView.OnNavigationItemSelectedListener,OnMapReadyCallback {
     private DrawerLayout drawerLayout;
     private ActionBarDrawerToggle mToggle;
     private MaterialSearchView searchView;
@@ -29,6 +33,7 @@ public class MainActivity extends BaseActivity implements View.OnClickListener,N
     private FloatingActionMenu floatingActionMenu;
     private com.github.clans.fab.FloatingActionButton fBtnTimDuong, fBtnThemDiaDiem;
     private Dialog dialog;
+    private GoogleApiClient googleApiClient;
 
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -38,6 +43,10 @@ public class MainActivity extends BaseActivity implements View.OnClickListener,N
 
         AnhXa();
         ThemSuKien();
+
+//        MapFragment mapFragment = (MapFragment) getFragmentManager()
+//                .findFragmentById(R.id.map);
+//        mapFragment.getMapAsync(this);
 
     }
 
@@ -93,6 +102,7 @@ public class MainActivity extends BaseActivity implements View.OnClickListener,N
     public void onClick(View view) {
         int id = view.getId();
         switch (id) {
+//            Close dialog
             case R.id.btnQuayLai:
             {
                 dialog.dismiss();
@@ -155,5 +165,18 @@ public class MainActivity extends BaseActivity implements View.OnClickListener,N
         Button btnQuayLai = (Button) dialog.findViewById(R.id.btnQuayLai);
         btnQuayLai.setOnClickListener(MainActivity.this);
         dialog.show();
+    }
+
+    @Override
+    public void onMapReady(GoogleMap map) {
+//        LatLng sydney = new LatLng(10.956065,106.842687);
+//
+//        map.setMyLocationEnabled(true);
+//        map.moveCamera(CameraUpdateFactory.newLatLngZoom(sydney, 13));
+//
+//        map.addMarker(new MarkerOptions()
+//                .title("Sydney")
+//                .snippet("The most populous city in Australia.")
+//                .position(sydney));
     }
 }

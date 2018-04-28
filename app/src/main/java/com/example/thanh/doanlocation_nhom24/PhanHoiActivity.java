@@ -1,5 +1,7 @@
 package com.example.thanh.doanlocation_nhom24;
 
+import android.content.Intent;
+import android.net.Uri;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.Menu;
@@ -10,6 +12,8 @@ import android.widget.Toast;
 public class PhanHoiActivity extends BaseActivity {
 
     private EditText edEmail,edNoiDung;
+    private final String EMAIL = "thanhvantran052@gmail.com";
+    private String email="",noidung="";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -40,7 +44,30 @@ public class PhanHoiActivity extends BaseActivity {
         int id = item.getItemId();
         switch(id) {
             case R.id.itPhanHoi: {
-                Toast.makeText(this, "Vừa mới bấm gửi", Toast.LENGTH_SHORT).show();
+                email = edEmail.getText().toString();
+                if(email.equals("")) {
+                    Toast.makeText(this, "Bạn chưa nhập email", Toast.LENGTH_SHORT).show();
+                }
+                else {
+                    noidung = edNoiDung.getText().toString();
+                    if(noidung.equals("")){
+                        Toast.makeText(this, "Bạn chưa nhập nội dung", Toast.LENGTH_SHORT).show();
+                    }
+                    else {
+                        Intent emailPhanHoi = new Intent(Intent.ACTION_SENDTO);
+                        emailPhanHoi.setData(Uri.parse("mailto:"+EMAIL));
+                        emailPhanHoi.putExtra(Intent.EXTRA_SUBJECT,email);
+                        emailPhanHoi.putExtra(Intent.EXTRA_TEXT,noidung);
+
+                        try {
+                            startActivity(Intent.createChooser(emailPhanHoi,"Send email"));
+                            finish();
+                        }
+                        catch(android.content.ActivityNotFoundException ex){
+                            Toast.makeText(this, "Mail của bạn không tồn tại!!!", Toast.LENGTH_SHORT).show();
+                        }
+                    }
+                }
             }
             break;
             case android.R.id.home:

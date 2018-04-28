@@ -18,7 +18,7 @@
         android:inputType="textEmailAddress"
         android:background="@drawable/custom_ed_phan_hoi"
         style="@style/phanhoi"
-        android:text=""
+        android:text = ""
         />
 
     <EditText
@@ -31,6 +31,7 @@
         android:layout_margin="10dp"
         android:background="@drawable/custom_ed_phan_hoi"
         style="@style/phanhoi"
+        android:text=""
         />
 
 </LinearLayout>

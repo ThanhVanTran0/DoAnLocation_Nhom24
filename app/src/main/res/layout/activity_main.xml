@@ -11,13 +11,14 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
-        <!--<fragment-->
-            <!--android:id="@+id/map"-->
-            <!--android:layout_width="match_parent"-->
-            <!--android:layout_height="match_parent"-->
-            <!--tools:context=".MapsActivity"-->
-            <!--android:name="com.google.android.gms.maps.MapFragment"-->
-            <!--/>-->
+        <fragment
+            android:id="@+id/map"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            tools:context=".MapsActivity"
+            android:name="com.google.android.gms.maps.MapFragment"
+            />
+
 
         <include layout="@layout/my_toolbar"/>
 
