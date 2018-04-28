@@ -7,13 +7,11 @@ import android.support.v4.app.FragmentStatePagerAdapter;
 //Dùng để điều khiển 2 tab
 public class PageAdapter extends FragmentStatePagerAdapter {
 
-    private int soTab;
-    private TabYeuThich tabYeuThich;
-    private  TabDiaDiemSeDen tabDiaDiemSeDen;
+    private final TabYeuThich tabYeuThich;
+    private final TabDiaDiemSeDen tabDiaDiemSeDen;
 
-    public PageAdapter(FragmentManager fm, int soTab) {
+    public PageAdapter(FragmentManager fm) {
         super(fm);
-        this.soTab = soTab;
         tabYeuThich = new TabYeuThich();
         tabDiaDiemSeDen = new TabDiaDiemSeDen();
     }
@@ -32,6 +30,18 @@ public class PageAdapter extends FragmentStatePagerAdapter {
 
     @Override
     public int getCount() {
-        return 0;
+        return 2;
+    }
+
+    @Override
+    public CharSequence getPageTitle(int position) {
+        switch (position)
+        {
+            case 0:
+                return "Yêu Thích";
+            case 1:
+                return "Sẽ Đến";
+        }
+        return "";
     }
 }

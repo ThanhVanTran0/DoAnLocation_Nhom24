@@ -8,7 +8,10 @@ import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
 
-public class DiaDiemCuaBanActivity extends BaseActivity implements TabYeuThich.OnFragmentInteractionListener, TabDiaDiemSeDen.OnFragmentInteractionListener{
+public class DiaDiemCuaBanActivity extends BaseActivity {
+
+    private TabLayout tabLayout;
+    private ViewPager viewPager;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -17,31 +20,22 @@ public class DiaDiemCuaBanActivity extends BaseActivity implements TabYeuThich.O
 
         inItToolBar("Địa điểm của bạn");
 
-        TabLayout tabLayout = (TabLayout) findViewById(R.id.tabLayout);
-        tabLayout.addTab(tabLayout.newTab().setText("Yêu Thích"));
-        tabLayout.addTab(tabLayout.newTab().setText("Sẽ đến"));
+        AnhXa();
+        setupViewPapge(viewPager);
+        tabLayout.setupWithViewPager(viewPager);
 
-        final ViewPager viewPager = findViewById(R.id.viewPaper);
-        final PageAdapter adapter = new PageAdapter(getSupportFragmentManager(),tabLayout.getTabCount());
+    }
+
+
+    private void setupViewPapge(ViewPager viewPager) {
+        PageAdapter adapter = new PageAdapter(getSupportFragmentManager());
         viewPager.setAdapter(adapter);
+        viewPager.setOffscreenPageLimit(2);
+    }
 
-        viewPager.setOnPageChangeListener(new TabLayout.TabLayoutOnPageChangeListener(tabLayout));
-        tabLayout.setOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
-            @Override
-            public void onTabSelected(TabLayout.Tab tab) {
-                viewPager.setCurrentItem(tab.getPosition());
-            }
-
-            @Override
-            public void onTabUnselected(TabLayout.Tab tab) {
-
-            }
-
-            @Override
-            public void onTabReselected(TabLayout.Tab tab) {
-
-            }
-        });
+    private void AnhXa() {
+        tabLayout = findViewById(R.id.tabLayout);
+        viewPager =findViewById(R.id.viewPaper);
     }
 
     @Override
@@ -60,10 +54,5 @@ public class DiaDiemCuaBanActivity extends BaseActivity implements TabYeuThich.O
     @Override
     public void onBackPressed() {
         super.onBackPressed();
-    }
-
-    @Override
-    public void onFragmentInteraction(Uri uri) {
-
     }
 }
