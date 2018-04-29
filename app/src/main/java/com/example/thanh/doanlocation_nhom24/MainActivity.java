@@ -1,39 +1,58 @@
 package com.example.thanh.doanlocation_nhom24;
 
+import android.Manifest;
 import android.app.Dialog;
 import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.location.Criteria;
+import android.location.Location;
+import android.location.LocationListener;
+import android.location.LocationManager;
 import android.support.annotation.NonNull;
 import android.support.design.widget.NavigationView;
+import android.support.v4.app.ActivityCompat;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.github.clans.fab.FloatingActionMenu;
+import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.common.GooglePlayServicesUtil;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapFragment;
 import com.google.android.gms.maps.OnMapReadyCallback;
+import com.google.android.gms.maps.UiSettings;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.miguelcatalan.materialsearchview.MaterialSearchView;
 
+import static com.google.android.gms.maps.CameraUpdateFactory.newLatLng;
+import static com.google.android.gms.maps.CameraUpdateFactory.zoomTo;
+
 //Activity Trang chu
-public class MainActivity extends BaseActivity implements View.OnClickListener,NavigationView.OnNavigationItemSelectedListener,OnMapReadyCallback {
+public class MainActivity extends BaseActivity implements View.OnClickListener,NavigationView.OnNavigationItemSelectedListener,OnMapReadyCallback,LocationListener {
     private DrawerLayout drawerLayout;
     private ActionBarDrawerToggle mToggle;
     private MaterialSearchView searchView;
     private NavigationView navigationView;
     private FloatingActionMenu floatingActionMenu;
-    private com.github.clans.fab.FloatingActionButton fBtnTimDuong, fBtnThemDiaDiem;
+    private com.github.clans.fab.FloatingActionButton fBtnTimDuong, fBtnThemDiaDiem,fBtnMyLoacation;
     private Dialog dialog;
     private GoogleApiClient googleApiClient;
+    private GoogleMap googleMap;
+    private double latitude = 0;
+    private double longitude = 0;
+    private  int PROXIMITY_RADIUS = 5000; //Bán kính tìm kiếm
 
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -44,10 +63,11 @@ public class MainActivity extends BaseActivity implements View.OnClickListener,N
         AnhXa();
         ThemSuKien();
 
-//        MapFragment mapFragment = (MapFragment) getFragmentManager()
-//                .findFragmentById(R.id.map);
-//        mapFragment.getMapAsync(this);
-
+        if (!isGooglePlayServiceAvailable())
+            finish();
+        MapFragment mapFragment = (MapFragment) getFragmentManager()
+                .findFragmentById(R.id.map);
+        mapFragment.getMapAsync(this);
     }
 
     private void ThemSuKien() {
@@ -57,11 +77,31 @@ public class MainActivity extends BaseActivity implements View.OnClickListener,N
         mToggle.syncState();
 
 //      Search view
+
         searchView.setSuggestions(getResources().getStringArray(R.array.query_suggestions));
         searchView.setOnQueryTextListener(new MaterialSearchView.OnQueryTextListener() {
             @Override
             public boolean onQueryTextSubmit(String query) {
-                Toast.makeText(MainActivity.this,"Moi submit: " + query,Toast.LENGTH_LONG).show();
+                Toast.makeText(MainActivity.this, query, Toast.LENGTH_SHORT).show();
+
+                latitude = googleMap.getMyLocation().getLatitude();
+                longitude = googleMap.getMyLocation().getLongitude();
+                String type = query;
+                StringBuilder googlePlacesUrl = new StringBuilder("https://maps.googleapis.com/maps/api/place/nearbysearch/json?");
+                googlePlacesUrl.append("location=" + latitude + "," + longitude);
+                googlePlacesUrl.append("&radius=" + PROXIMITY_RADIUS);
+                googlePlacesUrl.append("&types=" + type);
+                googlePlacesUrl.append("&sensor=true");
+                googlePlacesUrl.append("&key=" + getResources().getString(R.string.API));
+
+                Log.e("URL", googlePlacesUrl.toString());
+                GooglePlacesReadTask googlePlacesReadTask = new GooglePlacesReadTask();
+                Object[] toPass = new Object[2];
+                toPass[0] = googleMap;
+                toPass[1] = googlePlacesUrl.toString();
+                googlePlacesReadTask.execute(toPass);
+
+
                 return false;
             }
 
@@ -75,6 +115,7 @@ public class MainActivity extends BaseActivity implements View.OnClickListener,N
         navigationView.setNavigationItemSelectedListener(this);
         fBtnTimDuong.setOnClickListener(this);
         fBtnThemDiaDiem.setOnClickListener(this);
+        fBtnMyLoacation.setOnClickListener(this);
     }
 
     private void AnhXa() {
@@ -87,6 +128,7 @@ public class MainActivity extends BaseActivity implements View.OnClickListener,N
         floatingActionMenu = (FloatingActionMenu) findViewById(R.id.fabMenu);
         fBtnThemDiaDiem = floatingActionMenu.findViewById(R.id.fabBtnThemDiaDiem);
         fBtnTimDuong =  floatingActionMenu.findViewById(R.id.fabBtnTimDuong);
+        fBtnMyLoacation = findViewById(R.id.fBtnMyLocation);
     }
 
     @Override
@@ -108,7 +150,43 @@ public class MainActivity extends BaseActivity implements View.OnClickListener,N
                 dialog.dismiss();
             }
             break;
+            case R.id.fabBtnThemDiaDiem:
+            {
+                Toast.makeText(this, "Them dia diem", Toast.LENGTH_SHORT).show();
+            }
+            break;
+            case R.id.fabBtnTimDuong:
+            {
+                Toast.makeText(this, "Tim duong", Toast.LENGTH_SHORT).show();
+            }
+            break;
+            case R.id.fBtnMyLocation:
+            {
+                if(googleMap != null){
+
+                    LocationManager locationManager = (LocationManager) getSystemService(LOCATION_SERVICE);
+
+                    Criteria criteria = new Criteria();
+
+                    String bestProvider = locationManager.getBestProvider(criteria, true);
+
+                    if ( ActivityCompat.checkSelfPermission( this, android.Manifest.permission.ACCESS_COARSE_LOCATION ) != PackageManager.PERMISSION_GRANTED ) {
+
+                        ActivityCompat.requestPermissions( this, new String[] {  android.Manifest.permission.ACCESS_COARSE_LOCATION  },
+                                200);
+                    }
+                    Location location = locationManager.getLastKnownLocation(bestProvider);
+
+
+                    if (location != null) {
+                        onLocationChanged(location);
+                    }
+                    locationManager.requestLocationUpdates(bestProvider, 20000, 0, this);
+                }
+            }
+            break;
         }
+
     }
 
     @Override
@@ -169,14 +247,56 @@ public class MainActivity extends BaseActivity implements View.OnClickListener,N
 
     @Override
     public void onMapReady(GoogleMap map) {
-//        LatLng sydney = new LatLng(10.956065,106.842687);
-//
-//        map.setMyLocationEnabled(true);
-//        map.moveCamera(CameraUpdateFactory.newLatLngZoom(sydney, 13));
-//
-//        map.addMarker(new MarkerOptions()
-//                .title("Sydney")
-//                .snippet("The most populous city in Australia.")
-//                .position(sydney));
+           this.googleMap = map;
+    }
+
+    @Override
+    public void onLocationChanged(Location location) {
+        double latitude = location.getLatitude();
+        double longitude = location.getLongitude();
+        LatLng latLng = new LatLng(latitude, longitude);
+        googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng, 13));
+                googleMap.addMarker(new MarkerOptions()
+                .title("Sydney")
+                .snippet("The most populous city in Australia.")
+                .position(latLng));
+    }
+
+    @Override
+    public void onStatusChanged(String s, int i, Bundle bundle) {
+
+    }
+
+    @Override
+    public void onProviderEnabled(String s) {
+
+    }
+
+    @Override
+    public void onProviderDisabled(String s) {
+
+    }
+
+    public boolean isGooglePlayServiceAvailable() {
+        int status = GooglePlayServicesUtil.isGooglePlayServicesAvailable(this);
+        if(status == ConnectionResult.SUCCESS){
+            return  true;
+        }
+        else{
+            GooglePlayServicesUtil.getErrorDialog(status, this, 0).show();
+            return false;
+        }
+    }
+
+    private boolean checkPermission() {
+        return (ActivityCompat.checkSelfPermission(this , Manifest.permission.ACCESS_FINE_LOCATION)
+                == PackageManager.PERMISSION_GRANTED );
+    }
+
+    private void askPermission() {
+        ActivityCompat.requestPermissions(
+                this,
+                new String[] { Manifest.permission.ACCESS_FINE_LOCATION }, 200
+        );
     }
 }
