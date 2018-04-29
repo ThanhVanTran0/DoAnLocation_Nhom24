@@ -1,26 +1,28 @@
 package com.example.thanh.doanlocation_nhom24;
 
 import android.Manifest;
+import android.app.AlertDialog;
 import android.app.Dialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.location.Criteria;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
+import android.os.Bundle;
+import android.provider.Settings;
 import android.support.annotation.NonNull;
 import android.support.design.widget.NavigationView;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
-import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import com.github.clans.fab.FloatingActionMenu;
@@ -31,28 +33,25 @@ import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapFragment;
 import com.google.android.gms.maps.OnMapReadyCallback;
-import com.google.android.gms.maps.UiSettings;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.miguelcatalan.materialsearchview.MaterialSearchView;
 
-import static com.google.android.gms.maps.CameraUpdateFactory.newLatLng;
-import static com.google.android.gms.maps.CameraUpdateFactory.zoomTo;
-
 //Activity Trang chu
-public class MainActivity extends BaseActivity implements View.OnClickListener,NavigationView.OnNavigationItemSelectedListener,OnMapReadyCallback,LocationListener {
+public class MainActivity extends BaseActivity implements View.OnClickListener, NavigationView.OnNavigationItemSelectedListener, OnMapReadyCallback, LocationListener {
     private DrawerLayout drawerLayout;
     private ActionBarDrawerToggle mToggle;
     private MaterialSearchView searchView;
     private NavigationView navigationView;
     private FloatingActionMenu floatingActionMenu;
-    private com.github.clans.fab.FloatingActionButton fBtnTimDuong, fBtnThemDiaDiem,fBtnMyLoacation;
+    private com.github.clans.fab.FloatingActionButton fBtnTimDuong, fBtnThemDiaDiem, fBtnMyLoacation;
     private Dialog dialog;
     private GoogleApiClient googleApiClient;
     private GoogleMap googleMap;
     private double latitude = 0;
     private double longitude = 0;
-    private  int PROXIMITY_RADIUS = 5000; //Bán kính tìm kiếm
+    private int PROXIMITY_RADIUS = 5000; //Bán kính tìm kiếm
+    private LocationManager locationManager;
 
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -72,7 +71,7 @@ public class MainActivity extends BaseActivity implements View.OnClickListener,N
 
     private void ThemSuKien() {
         //Add Nav drawer
-        mToggle = new ActionBarDrawerToggle(this,drawerLayout,R.string.open,R.string.close);
+        mToggle = new ActionBarDrawerToggle(this, drawerLayout, R.string.open, R.string.close);
         drawerLayout.addDrawerListener(mToggle);
         mToggle.syncState();
 
@@ -82,6 +81,7 @@ public class MainActivity extends BaseActivity implements View.OnClickListener,N
         searchView.setOnQueryTextListener(new MaterialSearchView.OnQueryTextListener() {
             @Override
             public boolean onQueryTextSubmit(String query) {
+//                todo
                 Toast.makeText(MainActivity.this, query, Toast.LENGTH_SHORT).show();
 
                 latitude = googleMap.getMyLocation().getLatitude();
@@ -92,16 +92,15 @@ public class MainActivity extends BaseActivity implements View.OnClickListener,N
                 googlePlacesUrl.append("&radius=" + PROXIMITY_RADIUS);
                 googlePlacesUrl.append("&types=" + type);
                 googlePlacesUrl.append("&sensor=true");
-                googlePlacesUrl.append("&key=" + getResources().getString(R.string.API));
-
+                googlePlacesUrl.append("&key=" + "AIzaSyDviXBV3UhvjTvNkDrZvv5i9sg_9Ekxwuo");
+//Mượn tạm api của thắng
+                String a = googlePlacesUrl.toString();
                 Log.e("URL", googlePlacesUrl.toString());
                 GooglePlacesReadTask googlePlacesReadTask = new GooglePlacesReadTask();
                 Object[] toPass = new Object[2];
                 toPass[0] = googleMap;
                 toPass[1] = googlePlacesUrl.toString();
                 googlePlacesReadTask.execute(toPass);
-
-
                 return false;
             }
 
@@ -120,20 +119,20 @@ public class MainActivity extends BaseActivity implements View.OnClickListener,N
 
     private void AnhXa() {
         //Add Material Search
-        searchView =(MaterialSearchView) findViewById(R.id.search_view);
+        searchView = (MaterialSearchView) findViewById(R.id.search_view);
 
         drawerLayout = (DrawerLayout) findViewById(R.id.drawer);
         navigationView = findViewById(R.id.navView);
 
         floatingActionMenu = (FloatingActionMenu) findViewById(R.id.fabMenu);
         fBtnThemDiaDiem = floatingActionMenu.findViewById(R.id.fabBtnThemDiaDiem);
-        fBtnTimDuong =  floatingActionMenu.findViewById(R.id.fabBtnTimDuong);
+        fBtnTimDuong = floatingActionMenu.findViewById(R.id.fabBtnTimDuong);
         fBtnMyLoacation = findViewById(R.id.fBtnMyLocation);
     }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.menu_trangchu,menu);
+        getMenuInflater().inflate(R.menu.menu_trangchu, menu);
         MenuItem item = menu.findItem(R.id.itsearch);
         searchView.setMenuItem(item);
 
@@ -145,43 +144,29 @@ public class MainActivity extends BaseActivity implements View.OnClickListener,N
         int id = view.getId();
         switch (id) {
 //            Close dialog
-            case R.id.btnQuayLai:
-            {
+            case R.id.btnQuayLai: {
                 dialog.dismiss();
             }
             break;
-            case R.id.fabBtnThemDiaDiem:
-            {
+            case R.id.fabBtnThemDiaDiem: {
                 Toast.makeText(this, "Them dia diem", Toast.LENGTH_SHORT).show();
             }
             break;
-            case R.id.fabBtnTimDuong:
-            {
+            case R.id.fabBtnTimDuong: {
                 Toast.makeText(this, "Tim duong", Toast.LENGTH_SHORT).show();
             }
             break;
-            case R.id.fBtnMyLocation:
-            {
-                if(googleMap != null){
+            case R.id.fBtnMyLocation: {
+                Location location = getLoaction();
+                if (location == null) {
+                    Toast.makeText(this, "Đang tìm địa điểm", Toast.LENGTH_SHORT).show();
+                } else {
+                    double latitude = location.getLatitude();
+                    double longitude = location.getLongitude();
+                    LatLng latLng = new LatLng(latitude, longitude);
+                    googleMap.setMyLocationEnabled(true);
 
-                    LocationManager locationManager = (LocationManager) getSystemService(LOCATION_SERVICE);
-
-                    Criteria criteria = new Criteria();
-
-                    String bestProvider = locationManager.getBestProvider(criteria, true);
-
-                    if ( ActivityCompat.checkSelfPermission( this, android.Manifest.permission.ACCESS_COARSE_LOCATION ) != PackageManager.PERMISSION_GRANTED ) {
-
-                        ActivityCompat.requestPermissions( this, new String[] {  android.Manifest.permission.ACCESS_COARSE_LOCATION  },
-                                200);
-                    }
-                    Location location = locationManager.getLastKnownLocation(bestProvider);
-
-
-                    if (location != null) {
-                        onLocationChanged(location);
-                    }
-                    locationManager.requestLocationUpdates(bestProvider, 20000, 0, this);
+                    googleMap.animateCamera(CameraUpdateFactory.newLatLngZoom(latLng, 13),1500,null);
                 }
             }
             break;
@@ -191,10 +176,10 @@ public class MainActivity extends BaseActivity implements View.OnClickListener,N
 
     @Override
     public void onBackPressed() {
-        if(this.drawerLayout.isDrawerOpen(GravityCompat.START)){
+        if (this.drawerLayout.isDrawerOpen(GravityCompat.START)) {
             this.drawerLayout.closeDrawer(GravityCompat.START);
         }
-        if(searchView.isSearchOpen())
+        if (searchView.isSearchOpen())
             searchView.closeSearch();
         else {
             super.onBackPressed();
@@ -203,7 +188,7 @@ public class MainActivity extends BaseActivity implements View.OnClickListener,N
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        if(mToggle.onOptionsItemSelected(item)) {
+        if (mToggle.onOptionsItemSelected(item)) {
 
             return true;
         }
@@ -214,20 +199,17 @@ public class MainActivity extends BaseActivity implements View.OnClickListener,N
     public boolean onNavigationItemSelected(@NonNull MenuItem item) {
         int id = item.getItemId();
         switch (id) {
-            case R.id.navThongtin:
-            {
+            case R.id.navThongtin: {
                 CustomDialog();
             }
             break;
-            case R.id.navPhanhoi:
-            {
-                Intent intent = new Intent(MainActivity.this,PhanHoiActivity.class);
+            case R.id.navPhanhoi: {
+                Intent intent = new Intent(MainActivity.this, PhanHoiActivity.class);
                 startActivity(intent);
             }
             break;
-            case R.id.navLocation:
-            {
-                Intent intent = new Intent(MainActivity.this,DiaDiemCuaBanActivity.class);
+            case R.id.navLocation: {
+                Intent intent = new Intent(MainActivity.this, DiaDiemCuaBanActivity.class);
                 startActivity(intent);
             }
             break;
@@ -247,7 +229,20 @@ public class MainActivity extends BaseActivity implements View.OnClickListener,N
 
     @Override
     public void onMapReady(GoogleMap map) {
-           this.googleMap = map;
+        this.googleMap = map;
+        googleMap.setMyLocationEnabled(false);
+        googleMap.getUiSettings().setMapToolbarEnabled(false);
+        locationManager = (LocationManager) getSystemService(LOCATION_SERVICE);
+
+        Location location = getLoaction();
+        while (location == null) {
+            location = getLoaction();
+        }
+        double latitude = location.getLatitude();
+        double longitude = location.getLongitude();
+        LatLng latLng = new LatLng(latitude, longitude);
+        googleMap.setMyLocationEnabled(true);
+        googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng, 13));
     }
 
     @Override
@@ -255,11 +250,8 @@ public class MainActivity extends BaseActivity implements View.OnClickListener,N
         double latitude = location.getLatitude();
         double longitude = location.getLongitude();
         LatLng latLng = new LatLng(latitude, longitude);
+        googleMap.setMyLocationEnabled(true);
         googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng, 13));
-                googleMap.addMarker(new MarkerOptions()
-                .title("Sydney")
-                .snippet("The most populous city in Australia.")
-                .position(latLng));
     }
 
     @Override
@@ -279,24 +271,29 @@ public class MainActivity extends BaseActivity implements View.OnClickListener,N
 
     public boolean isGooglePlayServiceAvailable() {
         int status = GooglePlayServicesUtil.isGooglePlayServicesAvailable(this);
-        if(status == ConnectionResult.SUCCESS){
-            return  true;
-        }
-        else{
+        if (status == ConnectionResult.SUCCESS) {
+            return true;
+        } else {
             GooglePlayServicesUtil.getErrorDialog(status, this, 0).show();
             return false;
         }
     }
 
-    private boolean checkPermission() {
-        return (ActivityCompat.checkSelfPermission(this , Manifest.permission.ACCESS_FINE_LOCATION)
-                == PackageManager.PERMISSION_GRANTED );
-    }
+    private Location getLoaction() {
+        if (googleMap != null) {
+            Criteria criteria = new Criteria();
+            String bestProvider = locationManager.getBestProvider(criteria, true);
 
-    private void askPermission() {
-        ActivityCompat.requestPermissions(
-                this,
-                new String[] { Manifest.permission.ACCESS_FINE_LOCATION }, 200
-        );
+            if (ActivityCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+
+                ActivityCompat.requestPermissions(this, new String[]{android.Manifest.permission.ACCESS_COARSE_LOCATION},
+                        200);
+            } else {
+                Location location = locationManager.getLastKnownLocation(bestProvider);
+                if (location != null)
+                    return location;
+            }
+        }
+        return null;
     }
 }
