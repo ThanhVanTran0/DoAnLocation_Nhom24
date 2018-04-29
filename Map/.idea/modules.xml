@@ -3,7 +3,9 @@
   <component name="ProjectModuleManager">
     <modules>
       <module fileurl="file://$PROJECT_DIR$/Map.iml" filepath="$PROJECT_DIR$/Map.iml" />
+      <module fileurl="file://E:\LOCATION\DoAnLocation_Nhom24\Map\Map.iml" filepath="E:\LOCATION\DoAnLocation_Nhom24\Map\Map.iml" />
       <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
+      <module fileurl="file://E:\LOCATION\DoAnLocation_Nhom24\Map\app\app.iml" filepath="E:\LOCATION\DoAnLocation_Nhom24\Map\app\app.iml" />
     </modules>
   </component>
 </project>

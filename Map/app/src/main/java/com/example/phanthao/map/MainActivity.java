@@ -60,6 +60,8 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     AutoCompleteTextView diemdi;
     AutoCompleteTextView diemden;
     Button timduong;
+    TextView khoangcach;
+    TextView thoigian;
     private List<Marker> originMarkers = new ArrayList<>();
     private List<Marker> destinationMarkers = new ArrayList<>();
     private List<Polyline> polylinePaths = new ArrayList<>();
@@ -75,6 +77,8 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         mapFragment.getMapAsync(this);
         diemdi= (AutoCompleteTextView)findViewById(R.id.di);
         diemden=(AutoCompleteTextView)findViewById(R.id.den);
+        khoangcach=(TextView)findViewById(R.id.direction);
+        thoigian=(TextView)findViewById(R.id.time);
         timduong=(Button)findViewById(R.id.chiduong);
         timduong.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -89,16 +93,16 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         String origin = diemdi.getText().toString();
         String destination = diemden.getText().toString();
         if (origin.isEmpty()) {
-            Toast.makeText(this, "Please enter origin address!", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, "Bạn chưa nhập điểm đi!", Toast.LENGTH_SHORT).show();
             return;
         }
         if (destination.isEmpty()) {
-            Toast.makeText(this, "Please enter destination address!", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, "Bạn chưa nhập điểm đến!", Toast.LENGTH_SHORT).show();
             return;
         }
 
         try {
-            new DirectionFinder(this, origin, destination).execute();
+            new DirectionFinder(this,origin,destination).execute();
         } catch (UnsupportedEncodingException e) {
             e.printStackTrace();
         }
@@ -127,8 +131,8 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     }
     @Override
     public void onDirectionFinderStart() {
-        progressDialog = ProgressDialog.show(this, "Please wait.",
-                "Finding direction..!", true);
+        progressDialog = ProgressDialog.show(this, "Vui lòng đợi trong giây lát....",
+                "Đang tìm địa điểm!", true);
 
         if (originMarkers != null) {
             for (Marker marker : originMarkers) {
@@ -158,7 +162,8 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
 
         for (Route route : routes) {
             map.moveCamera(CameraUpdateFactory.newLatLngZoom(route.startLocation, 16));
-
+            khoangcach.setText(route.distance.text);
+            thoigian.setText(route.duration.text);
             originMarkers.add(map.addMarker(new MarkerOptions()
                     .title(route.startAddress)
                     .position(route.startLocation)));
