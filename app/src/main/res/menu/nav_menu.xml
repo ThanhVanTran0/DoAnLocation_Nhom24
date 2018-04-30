@@ -5,6 +5,25 @@
     >
 
     <group android:checkableBehavior="single"
+        android:id="@+id/group3"
+        >
+        <item android:id="@+id/navTimNhaHang"
+            android:title="@string/tim_nha_hang"
+            android:icon="@drawable/ic_restaurant_black_24dp"
+            />
+
+        <item android:id="@+id/navTimCafe"
+            android:title="@string/tim_cafe"
+            android:icon="@drawable/ic_local_cafe_black_24dp"
+            />
+
+        <item android:id="@+id/navThayDoiBanKinh"
+            android:title="@string/dc_ban_kinh_tim_kiem"
+            android:icon="@drawable/ic_pham_vi_tim_kiem_24dp"
+            />
+    </group>
+
+    <group android:checkableBehavior="single"
         android:id="@+id/group1"
         >
         <item android:id="@+id/navLocation"

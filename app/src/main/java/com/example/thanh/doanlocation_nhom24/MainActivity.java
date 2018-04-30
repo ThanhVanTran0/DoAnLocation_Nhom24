@@ -23,6 +23,9 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
+import android.widget.EditText;
+import android.widget.SeekBar;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.github.clans.fab.FloatingActionMenu;
@@ -45,13 +48,14 @@ public class MainActivity extends BaseActivity implements View.OnClickListener, 
     private NavigationView navigationView;
     private FloatingActionMenu floatingActionMenu;
     private com.github.clans.fab.FloatingActionButton fBtnTimDuong, fBtnThemDiaDiem, fBtnMyLoacation;
-    private Dialog dialog;
+    private Dialog dialog,dialog_chonBanKinh;
     private GoogleApiClient googleApiClient;
     private GoogleMap googleMap;
     private double latitude = 0;
     private double longitude = 0;
     private int PROXIMITY_RADIUS = 5000; //Bán kính tìm kiếm
     private LocationManager locationManager;
+    private SeekBar seekBarBanKinh;
 
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -81,26 +85,7 @@ public class MainActivity extends BaseActivity implements View.OnClickListener, 
         searchView.setOnQueryTextListener(new MaterialSearchView.OnQueryTextListener() {
             @Override
             public boolean onQueryTextSubmit(String query) {
-//                todo
-                Toast.makeText(MainActivity.this, query, Toast.LENGTH_SHORT).show();
-
-                latitude = googleMap.getMyLocation().getLatitude();
-                longitude = googleMap.getMyLocation().getLongitude();
-                String type = query;
-                StringBuilder googlePlacesUrl = new StringBuilder("https://maps.googleapis.com/maps/api/place/nearbysearch/json?");
-                googlePlacesUrl.append("location=" + latitude + "," + longitude);
-                googlePlacesUrl.append("&radius=" + PROXIMITY_RADIUS);
-                googlePlacesUrl.append("&types=" + type);
-                googlePlacesUrl.append("&sensor=true");
-                googlePlacesUrl.append("&key=" + "AIzaSyDviXBV3UhvjTvNkDrZvv5i9sg_9Ekxwuo");
-//Mượn tạm api của thắng
-                String a = googlePlacesUrl.toString();
-                Log.e("URL", googlePlacesUrl.toString());
-                GooglePlacesReadTask googlePlacesReadTask = new GooglePlacesReadTask();
-                Object[] toPass = new Object[2];
-                toPass[0] = googleMap;
-                toPass[1] = googlePlacesUrl.toString();
-                googlePlacesReadTask.execute(toPass);
+                TaoMarkerDiaDiem(query);
                 return false;
             }
 
@@ -148,6 +133,23 @@ public class MainActivity extends BaseActivity implements View.OnClickListener, 
                 dialog.dismiss();
             }
             break;
+            case R.id.btnClose_CBK:
+            {
+                dialog_chonBanKinh.dismiss();
+            }
+            break;
+            case R.id.btnDongY_CBK:
+            {
+                int BK = seekBarBanKinh.getProgress();
+                if(BK == 0) {
+                    Toast.makeText(this, "Bán kính tối thiểu là 1 KM", Toast.LENGTH_SHORT).show();
+                }
+                else {
+                    PROXIMITY_RADIUS = BK*1000;
+                }
+                dialog_chonBanKinh.dismiss();
+            }
+            break;
             case R.id.fabBtnThemDiaDiem: {
                 Toast.makeText(this, "Them dia diem", Toast.LENGTH_SHORT).show();
             }
@@ -157,7 +159,7 @@ public class MainActivity extends BaseActivity implements View.OnClickListener, 
             }
             break;
             case R.id.fBtnMyLocation: {
-                Location location = getLoaction();
+                Location location = getLocation();
                 if (location == null) {
                     Toast.makeText(this, "Đang tìm địa điểm", Toast.LENGTH_SHORT).show();
                 } else {
@@ -213,9 +215,55 @@ public class MainActivity extends BaseActivity implements View.OnClickListener, 
                 startActivity(intent);
             }
             break;
+            case R.id.navTimNhaHang:
+            {
+                TaoMarkerDiaDiem("restaurant");
+            }
+            break;
+            case R.id.navTimCafe:
+            {
+                TaoMarkerDiaDiem("cafe");
+            }
+            break;
+            case R.id.navThayDoiBanKinh:
+            {
+                ShowDialogChonBanKinh();
+            }
+            break;
         }
         this.drawerLayout.closeDrawer(GravityCompat.START);
         return false;
+    }
+
+    private void ShowDialogChonBanKinh() {
+        dialog_chonBanKinh = new Dialog(this);
+        dialog_chonBanKinh.setContentView(R.layout.dialog_chon_ban_kinh);
+        dialog_chonBanKinh.setCanceledOnTouchOutside(false);
+        Button btnClose = dialog_chonBanKinh.findViewById(R.id.btnClose_CBK);
+        Button btnOk = dialog_chonBanKinh.findViewById(R.id.btnDongY_CBK);
+        final TextView textView = dialog_chonBanKinh.findViewById(R.id.txtKMHienThi);
+        seekBarBanKinh = dialog_chonBanKinh.findViewById(R.id.sbBanKinh);
+        seekBarBanKinh.setProgress(PROXIMITY_RADIUS/1000);
+        seekBarBanKinh.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+            @Override
+            public void onProgressChanged(SeekBar seekBar, int i, boolean b) {
+                String KM = String.valueOf(i) + " KM";
+                textView.setText(KM);
+            }
+
+            @Override
+            public void onStartTrackingTouch(SeekBar seekBar) {
+
+            }
+
+            @Override
+            public void onStopTrackingTouch(SeekBar seekBar) {
+
+            }
+        });
+        btnClose.setOnClickListener(this);
+        btnOk.setOnClickListener(this);
+        dialog_chonBanKinh.show();
     }
 
     private void CustomDialog() {
@@ -232,17 +280,18 @@ public class MainActivity extends BaseActivity implements View.OnClickListener, 
         this.googleMap = map;
         googleMap.setMyLocationEnabled(false);
         googleMap.getUiSettings().setMapToolbarEnabled(false);
-        locationManager = (LocationManager) getSystemService(LOCATION_SERVICE);
 
-        Location location = getLoaction();
-        while (location == null) {
-            location = getLoaction();
+        Location location = getLocation();
+        if(location == null) {
+            Toast.makeText(this, "Không tìm được vị trí của bạn", Toast.LENGTH_SHORT).show();
         }
-        double latitude = location.getLatitude();
-        double longitude = location.getLongitude();
-        LatLng latLng = new LatLng(latitude, longitude);
-        googleMap.setMyLocationEnabled(true);
-        googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng, 13));
+        else {
+            double latitude = location.getLatitude();
+            double longitude = location.getLongitude();
+            LatLng latLng = new LatLng(latitude, longitude);
+            googleMap.setMyLocationEnabled(true);
+            googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng, 13));
+        }
     }
 
     @Override
@@ -279,8 +328,9 @@ public class MainActivity extends BaseActivity implements View.OnClickListener, 
         }
     }
 
-    private Location getLoaction() {
+    private Location getLocation() {
         if (googleMap != null) {
+            locationManager = (LocationManager) getSystemService(LOCATION_SERVICE);
             Criteria criteria = new Criteria();
             String bestProvider = locationManager.getBestProvider(criteria, true);
 
@@ -292,8 +342,29 @@ public class MainActivity extends BaseActivity implements View.OnClickListener, 
                 Location location = locationManager.getLastKnownLocation(bestProvider);
                 if (location != null)
                     return location;
+                locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER,0,0,this);
             }
         }
         return null;
+    }
+
+    private void TaoMarkerDiaDiem(String query){
+        latitude = googleMap.getMyLocation().getLatitude();
+        longitude = googleMap.getMyLocation().getLongitude();
+        String type = query;
+        StringBuilder googlePlacesUrl = new StringBuilder("https://maps.googleapis.com/maps/api/place/nearbysearch/json?");
+        googlePlacesUrl.append("location=" + latitude + "," + longitude);
+        googlePlacesUrl.append("&radius=" + PROXIMITY_RADIUS);
+        googlePlacesUrl.append("&types=" + type);
+        googlePlacesUrl.append("&sensor=true");
+        googlePlacesUrl.append("&key=" + "AIzaSyDviXBV3UhvjTvNkDrZvv5i9sg_9Ekxwuo");
+        //Mượn tạm api của thắng
+        String a = googlePlacesUrl.toString();
+        Log.e("URL", googlePlacesUrl.toString());
+        GooglePlacesReadTask googlePlacesReadTask = new GooglePlacesReadTask();
+        Object[] toPass = new Object[2];
+        toPass[0] = googleMap;
+        toPass[1] = googlePlacesUrl.toString();
+        googlePlacesReadTask.execute(toPass);
     }
 }
