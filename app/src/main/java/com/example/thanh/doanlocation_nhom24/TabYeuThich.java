@@ -7,6 +7,9 @@ import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ListView;
+
+import java.util.ArrayList;
 
 public class TabYeuThich extends Fragment {
     // TODO: Rename parameter arguments, choose names that match
@@ -41,7 +44,14 @@ public class TabYeuThich extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_tab_yeu_thich,null);
-
+        ListView listView = view.findViewById(R.id.lvDanhSachYeuThich);
+        ArrayList<DiaDiemUaThich> dsUuThich = new ArrayList<>();
+        dsUuThich.add(new DiaDiemUaThich(1,1,R.drawable.ic_launcher_background,R.drawable.ic_local_cafe_black_24dp,"Cafe Trung Nguyên","Ho Chi Minh"));
+        dsUuThich.add(new DiaDiemUaThich(1,1,R.drawable.ic_launcher_background,R.drawable.ic_local_cafe_black_24dp,"Cafe Trung Nguyên 2","Ho Chi Minh"));
+        CustomAdapter customAdapter = new CustomAdapter(getContext(),R.layout.layout_custom_listview_ddut,dsUuThich);
+        listView.setAdapter(customAdapter);
+        customAdapter.notifyDataSetChanged();
+//        Todo
         return view;
     }
 

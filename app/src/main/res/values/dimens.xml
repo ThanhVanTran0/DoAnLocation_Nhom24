@@ -1,10 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <dimen name="toolBarHeight">55dp</dimen>
-    <dimen name="cardViewWidth">100dp</dimen>
-    <dimen name="cardViewHeight">100dp</dimen>
-    <dimen name="imgCardViewWidth">50dp</dimen>
-    <dimen name="imgCardViewHeight">50dp</dimen>
+
+    <dimen name="imgHinhAnhDiaDiemWidth">75dp</dimen>
 
     <!-- Nav drawer dimen-->
     <dimen name="activity_horizontal_margin">16dp</dimen>
