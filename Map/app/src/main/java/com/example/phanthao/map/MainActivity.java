@@ -2,6 +2,7 @@ package com.example.phanthao.map;
 
 import android.Manifest;
 import android.annotation.SuppressLint;
+import android.app.Dialog;
 import android.app.Fragment;
 import android.app.LoaderManager;
 import android.app.ProgressDialog;
@@ -30,6 +31,7 @@ import android.widget.Toast;
 import com.google.android.gms.common.GooglePlayServicesNotAvailableException;
 import com.google.android.gms.common.GooglePlayServicesRepairableException;
 import com.google.android.gms.common.api.Status;
+import com.google.android.gms.location.places.AutocompleteFilter;
 import com.google.android.gms.location.places.GeoDataClient;
 import com.google.android.gms.location.places.Place;
 import com.google.android.gms.location.places.PlaceDetectionApi;
@@ -57,8 +59,8 @@ import java.util.List;
 
 public class MainActivity extends AppCompatActivity implements OnMapReadyCallback,DirectionFinderListener {
     GoogleMap map;
-    AutoCompleteTextView diemdi;
-    AutoCompleteTextView diemden;
+    PlaceAutocompleteFragment diemdi;
+    PlaceAutocompleteFragment diemden;
     Button timduong;
     TextView khoangcach;
     TextView thoigian;
@@ -66,7 +68,8 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     private List<Marker> destinationMarkers = new ArrayList<>();
     private List<Polyline> polylinePaths = new ArrayList<>();
     private ProgressDialog progressDialog;
-    Marker marker;
+    String origin="";
+    String destination="";
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -75,8 +78,10 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         setContentView(R.layout.activity_main);
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
-        diemdi= (AutoCompleteTextView)findViewById(R.id.di);
-        diemden=(AutoCompleteTextView)findViewById(R.id.den);
+        diemdi = (PlaceAutocompleteFragment)getFragmentManager().findFragmentById(R.id.di);
+        diemdi.setHint("Nhập địa điểm đi");
+        diemden = (PlaceAutocompleteFragment)getFragmentManager().findFragmentById(R.id.den);
+        diemden.setHint("Nhập địa điểm đến");
         khoangcach=(TextView)findViewById(R.id.direction);
         thoigian=(TextView)findViewById(R.id.time);
         timduong=(Button)findViewById(R.id.chiduong);
@@ -86,37 +91,44 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                 sendRequest();
             }
         });
-        PlaceAutocompleteFragment autocompleteFragment = (PlaceAutocompleteFragment)
-                getFragmentManager().findFragmentById(R.id.place);
-
-        autocompleteFragment.setOnPlaceSelectedListener(new PlaceSelectionListener() {
+        diemdi.setOnPlaceSelectedListener(new PlaceSelectionListener() {
             @Override
             public void onPlaceSelected(Place place) {
                 String PlaceName = place.getName().toString();
-               Toast toast = Toast.makeText(getApplicationContext(),""+PlaceName,Toast.LENGTH_SHORT);
-                // TODO: Get info about the selected place.
+                Toast toast = Toast.makeText(getApplicationContext(),""+PlaceName,Toast.LENGTH_SHORT);
+                origin = PlaceName;
             }
 
             @Override
             public void onError(Status status) {
-                // TODO: Handle the error.
+
+            }
+        });
+        diemden.setOnPlaceSelectedListener(new PlaceSelectionListener() {
+            @Override
+            public void onPlaceSelected(Place place) {
+                String PlaceName = place.getName().toString();
+                Toast toast = Toast.makeText(getApplicationContext(),""+PlaceName,Toast.LENGTH_SHORT);
+                destination = PlaceName;
+            }
+
+            @Override
+            public void onError(Status status) {
+
             }
         });
     }
 
 
     private void sendRequest() {
-        String origin = diemdi.getText().toString();
-        String destination = diemden.getText().toString();
-        if (origin.isEmpty()) {
+        if (origin.isEmpty()){
             Toast.makeText(this, "Bạn chưa nhập điểm đi!", Toast.LENGTH_SHORT).show();
             return;
         }
-        if (destination.isEmpty()) {
+        if (destination.isEmpty()){
             Toast.makeText(this, "Bạn chưa nhập điểm đến!", Toast.LENGTH_SHORT).show();
             return;
         }
-
         try {
             new DirectionFinder(this,origin,destination).execute();
         } catch (UnsupportedEncodingException e) {

@@ -7,23 +7,23 @@
     android:orientation="vertical"
     android:weightSum="1">
     <fragment
-        android:id="@+id/place"
+        android:id="@+id/di"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:name="com.google.android.gms.location.places.ui.PlaceAutocompleteFragment"
+        android:tag="Nhập điểm đi"
+        />
+   <LinearLayout
+       android:layout_width="match_parent"
+       android:layout_height="wrap_content"
+       >
+       <fragment
+        android:id="@+id/den"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:name="com.google.android.gms.location.places.ui.PlaceAutocompleteFragment"
         />
-    <AutoCompleteTextView
-        android:id="@+id/di"
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        android:hint="Nhập điểm đi"
-        android:ems="10"/>
-    <AutoCompleteTextView
-        android:id="@+id/den"
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        android:hint="Nhập điểm đến"
-        android:ems="10"/>
+   </LinearLayout>
     <LinearLayout
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
