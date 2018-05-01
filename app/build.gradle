@@ -33,12 +33,12 @@ dependencies {
     //noinspection GradleCompatible
     compile 'com.android.support:recyclerview-v7:25.1.0'
     //Add thư viện google play service
-    compile 'com.google.android.gms:play-services-maps:7.8.0'
-    compile 'com.google.android.gms:play-services-location:7.8.0'
+    //noinspection GradleCompatible
+    compile 'com.google.android.gms:play-services-maps:11.2.0'
+    compile 'com.google.android.gms:play-services-location:11.2.0'
+    compile 'com.google.android.gms:play-services-places:11.2.0'
 //    Add thư viện cho navigation drawer
     compile 'com.android.support:design:26.+'
-//    Add thư viên material searchview
-    compile 'com.miguelcatalan:materialsearchview:1.4.0'
 //    Add thư viên  floating menu. button
     compile 'com.github.clans:fab:1.6.4'
 }

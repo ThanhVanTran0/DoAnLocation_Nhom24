@@ -1,9 +1,7 @@
 package com.example.thanh.doanlocation_nhom24;
 
 import android.Manifest;
-import android.app.AlertDialog;
 import android.app.Dialog;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.location.Criteria;
@@ -11,7 +9,6 @@ import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.Bundle;
-import android.provider.Settings;
 import android.support.annotation.NonNull;
 import android.support.design.widget.NavigationView;
 import android.support.v4.app.ActivityCompat;
@@ -23,32 +20,34 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
-import android.widget.EditText;
 import android.widget.SeekBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.github.clans.fab.FloatingActionMenu;
 import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.common.GooglePlayServicesNotAvailableException;
+import com.google.android.gms.common.GooglePlayServicesRepairableException;
 import com.google.android.gms.common.GooglePlayServicesUtil;
 import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.common.api.Status;
+import com.google.android.gms.location.places.Place;
+import com.google.android.gms.location.places.ui.PlaceAutocomplete;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapFragment;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
-import com.miguelcatalan.materialsearchview.MaterialSearchView;
 
 //Activity Trang chu
 public class MainActivity extends BaseActivity implements View.OnClickListener, NavigationView.OnNavigationItemSelectedListener, OnMapReadyCallback, LocationListener {
     private DrawerLayout drawerLayout;
     private ActionBarDrawerToggle mToggle;
-    private MaterialSearchView searchView;
     private NavigationView navigationView;
     private FloatingActionMenu floatingActionMenu;
     private com.github.clans.fab.FloatingActionButton fBtnTimDuong, fBtnThemDiaDiem, fBtnMyLoacation;
-    private Dialog dialog,dialog_chonBanKinh;
+    private Dialog dialog, dialog_chonBanKinh;
     private GoogleApiClient googleApiClient;
     private GoogleMap googleMap;
     private double latitude = 0;
@@ -56,6 +55,9 @@ public class MainActivity extends BaseActivity implements View.OnClickListener, 
     private int PROXIMITY_RADIUS = 5000; //Bán kính tìm kiếm
     private LocationManager locationManager;
     private SeekBar seekBarBanKinh;
+
+    private final int PLACE_AUTOCOMPLETE_REQUEST_CODE = 1;
+
 
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -79,23 +81,6 @@ public class MainActivity extends BaseActivity implements View.OnClickListener, 
         drawerLayout.addDrawerListener(mToggle);
         mToggle.syncState();
 
-//      Search view
-
-        searchView.setSuggestions(getResources().getStringArray(R.array.query_suggestions));
-        searchView.setOnQueryTextListener(new MaterialSearchView.OnQueryTextListener() {
-            @Override
-            public boolean onQueryTextSubmit(String query) {
-                TaoMarkerDiaDiem(query);
-                return false;
-            }
-
-            @Override
-            public boolean onQueryTextChange(String newText) {
-                //Do something
-                return false;
-            }
-        });
-
         navigationView.setNavigationItemSelectedListener(this);
         fBtnTimDuong.setOnClickListener(this);
         fBtnThemDiaDiem.setOnClickListener(this);
@@ -103,9 +88,6 @@ public class MainActivity extends BaseActivity implements View.OnClickListener, 
     }
 
     private void AnhXa() {
-        //Add Material Search
-        searchView = (MaterialSearchView) findViewById(R.id.search_view);
-
         drawerLayout = (DrawerLayout) findViewById(R.id.drawer);
         navigationView = findViewById(R.id.navView);
 
@@ -118,9 +100,6 @@ public class MainActivity extends BaseActivity implements View.OnClickListener, 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.menu_trangchu, menu);
-        MenuItem item = menu.findItem(R.id.itsearch);
-        searchView.setMenuItem(item);
-
         return super.onCreateOptionsMenu(menu);
     }
 
@@ -133,19 +112,16 @@ public class MainActivity extends BaseActivity implements View.OnClickListener, 
                 dialog.dismiss();
             }
             break;
-            case R.id.btnClose_CBK:
-            {
+            case R.id.btnClose_CBK: {
                 dialog_chonBanKinh.dismiss();
             }
             break;
-            case R.id.btnDongY_CBK:
-            {
+            case R.id.btnDongY_CBK: {
                 int BK = seekBarBanKinh.getProgress();
-                if(BK == 0) {
+                if (BK == 0) {
                     Toast.makeText(this, "Bán kính tối thiểu là 1 KM", Toast.LENGTH_SHORT).show();
-                }
-                else {
-                    PROXIMITY_RADIUS = BK*1000;
+                } else {
+                    PROXIMITY_RADIUS = BK * 1000;
                 }
                 dialog_chonBanKinh.dismiss();
             }
@@ -166,9 +142,18 @@ public class MainActivity extends BaseActivity implements View.OnClickListener, 
                     double latitude = location.getLatitude();
                     double longitude = location.getLongitude();
                     LatLng latLng = new LatLng(latitude, longitude);
+                    if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+                        // TODO: Consider calling
+                        //    ActivityCompat#requestPermissions
+                        // here to request the missing permissions, and then overriding
+                        //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
+                        //                                          int[] grantResults)
+                        // to handle the case where the user grants the permission. See the documentation
+                        // for ActivityCompat#requestPermissions for more details.
+                        return;
+                    }
                     googleMap.setMyLocationEnabled(true);
-
-                    googleMap.animateCamera(CameraUpdateFactory.newLatLngZoom(latLng, 13),1500,null);
+                    googleMap.animateCamera(CameraUpdateFactory.newLatLngZoom(latLng, 13), 1500, null);
                 }
             }
             break;
@@ -181,8 +166,6 @@ public class MainActivity extends BaseActivity implements View.OnClickListener, 
         if (this.drawerLayout.isDrawerOpen(GravityCompat.START)) {
             this.drawerLayout.closeDrawer(GravityCompat.START);
         }
-        if (searchView.isSearchOpen())
-            searchView.closeSearch();
         else {
             super.onBackPressed();
         }
@@ -193,6 +176,18 @@ public class MainActivity extends BaseActivity implements View.OnClickListener, 
         if (mToggle.onOptionsItemSelected(item)) {
 
             return true;
+        }
+        if(item.getItemId() == R.id.itsearch){
+            try {
+                Intent intent =
+                        new PlaceAutocomplete.IntentBuilder(PlaceAutocomplete.MODE_FULLSCREEN)
+                                .build(this);
+                startActivityForResult(intent, PLACE_AUTOCOMPLETE_REQUEST_CODE);
+            } catch (GooglePlayServicesRepairableException e) {
+                // TODO: Handle the error.
+            } catch (GooglePlayServicesNotAvailableException e) {
+                // TODO: Handle the error.
+            }
         }
         return super.onOptionsItemSelected(item);
     }
@@ -215,18 +210,15 @@ public class MainActivity extends BaseActivity implements View.OnClickListener, 
                 startActivity(intent);
             }
             break;
-            case R.id.navTimNhaHang:
-            {
+            case R.id.navTimNhaHang: {
                 TaoMarkerDiaDiem("restaurant");
             }
             break;
-            case R.id.navTimCafe:
-            {
+            case R.id.navTimCafe: {
                 TaoMarkerDiaDiem("cafe");
             }
             break;
-            case R.id.navThayDoiBanKinh:
-            {
+            case R.id.navThayDoiBanKinh: {
                 ShowDialogChonBanKinh();
             }
             break;
@@ -243,7 +235,7 @@ public class MainActivity extends BaseActivity implements View.OnClickListener, 
         Button btnOk = dialog_chonBanKinh.findViewById(R.id.btnDongY_CBK);
         final TextView textView = dialog_chonBanKinh.findViewById(R.id.txtKMHienThi);
         seekBarBanKinh = dialog_chonBanKinh.findViewById(R.id.sbBanKinh);
-        seekBarBanKinh.setProgress(PROXIMITY_RADIUS/1000);
+        seekBarBanKinh.setProgress(PROXIMITY_RADIUS / 1000);
         seekBarBanKinh.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override
             public void onProgressChanged(SeekBar seekBar, int i, boolean b) {
@@ -278,14 +270,23 @@ public class MainActivity extends BaseActivity implements View.OnClickListener, 
     @Override
     public void onMapReady(GoogleMap map) {
         this.googleMap = map;
-        googleMap.setMyLocationEnabled(false);
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            // TODO: Consider calling
+            //    ActivityCompat#requestPermissions
+            // here to request the missing permissions, and then overriding
+            //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
+            //                                          int[] grantResults)
+            // to handle the case where the user grants the permission. See the documentation
+            // for ActivityCompat#requestPermissions for more details.
+            return;
+        }
+        googleMap.setMyLocationEnabled(true);
         googleMap.getUiSettings().setMapToolbarEnabled(false);
 
         Location location = getLocation();
-        if(location == null) {
+        if (location == null) {
             Toast.makeText(this, "Không tìm được vị trí của bạn", Toast.LENGTH_SHORT).show();
-        }
-        else {
+        } else {
             double latitude = location.getLatitude();
             double longitude = location.getLongitude();
             LatLng latLng = new LatLng(latitude, longitude);
@@ -299,6 +300,16 @@ public class MainActivity extends BaseActivity implements View.OnClickListener, 
         double latitude = location.getLatitude();
         double longitude = location.getLongitude();
         LatLng latLng = new LatLng(latitude, longitude);
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            // TODO: Consider calling
+            //    ActivityCompat#requestPermissions
+            // here to request the missing permissions, and then overriding
+            //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
+            //                                          int[] grantResults)
+            // to handle the case where the user grants the permission. See the documentation
+            // for ActivityCompat#requestPermissions for more details.
+            return;
+        }
         googleMap.setMyLocationEnabled(true);
         googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng, 13));
     }
@@ -366,5 +377,30 @@ public class MainActivity extends BaseActivity implements View.OnClickListener, 
         toPass[0] = googleMap;
         toPass[1] = googlePlacesUrl.toString();
         googlePlacesReadTask.execute(toPass);
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == PLACE_AUTOCOMPLETE_REQUEST_CODE) {
+            if (resultCode == RESULT_OK) {
+                Place place = PlaceAutocomplete.getPlace(this, data);
+                Toast.makeText(this, place.getName(), Toast.LENGTH_SHORT).show();
+                googleMap.clear();
+                LatLng latLng = place.getLatLng();
+                MarkerOptions markerOptions = new MarkerOptions();
+                markerOptions.position(latLng);
+                googleMap.addMarker(markerOptions);
+                googleMap.animateCamera(CameraUpdateFactory.newLatLngZoom(latLng, 13), 1500, null);
+
+            } else if (resultCode == PlaceAutocomplete.RESULT_ERROR) {
+                Status status = PlaceAutocomplete.getStatus(this, data);
+                // TODO: Handle the error.
+                Toast.makeText(this, "Lỗi, cần chỉnh sửa", Toast.LENGTH_SHORT).show();
+
+            } else if (resultCode == RESULT_CANCELED) {
+                // The user canceled the operation.
+            }
+        }
     }
 }
