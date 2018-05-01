@@ -44,7 +44,7 @@ class DirectionFinder {
     private String createurl() throws UnsupportedEncodingException {
         String urlorigin = URLEncoder.encode(origin, "utf-8");
         String urldestination = URLEncoder.encode(destination, "utf-8");
-        return URL_API + urlorigin + "&destination=" + urldestination + "&key=" + "";
+        return URL_API + urlorigin + "&destination=" + urldestination + "&key="+"";
     }
 // dữ liệu json
     private class DownloadData extends AsyncTask<String, Void, String> {
