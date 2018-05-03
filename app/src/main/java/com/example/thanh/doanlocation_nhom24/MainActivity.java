@@ -19,11 +19,16 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.Window;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
+import android.widget.EditText;
+import android.widget.LinearLayout;
 import android.widget.SeekBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.github.clans.fab.FloatingActionButton;
 import com.github.clans.fab.FloatingActionMenu;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GooglePlayServicesNotAvailableException;
@@ -33,11 +38,15 @@ import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.common.api.Status;
 import com.google.android.gms.location.places.Place;
 import com.google.android.gms.location.places.ui.PlaceAutocomplete;
+import com.google.android.gms.location.places.ui.PlacePicker;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapFragment;
 import com.google.android.gms.maps.OnMapReadyCallback;
+import com.google.android.gms.maps.model.BitmapDescriptor;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 
 //Activity Trang chu
@@ -47,7 +56,7 @@ public class MainActivity extends BaseActivity implements View.OnClickListener, 
     private NavigationView navigationView;
     private FloatingActionMenu floatingActionMenu;
     private com.github.clans.fab.FloatingActionButton fBtnTimDuong, fBtnThemDiaDiem, fBtnMyLoacation;
-    private Dialog dialog, dialog_chonBanKinh;
+    private Dialog dialog, dialog_chonBanKinh,dialog_timDuong;
     private GoogleApiClient googleApiClient;
     private GoogleMap googleMap;
     private double latitude = 0;
@@ -55,21 +64,37 @@ public class MainActivity extends BaseActivity implements View.OnClickListener, 
     private int PROXIMITY_RADIUS = 5000; //Bán kính tìm kiếm
     private LocationManager locationManager;
     private SeekBar seekBarBanKinh;
+    private LinearLayout lnChonDiaDiem;
+    private Button cddBtnThoat,cddBtnOk;
+    private EditText edDiaDiemXuatPhat,edDiaDiemDen;
 
     private final int PLACE_AUTOCOMPLETE_REQUEST_CODE = 1;
+    private final int PLACE_AUTOCOMPLETE_DIA_DIEMXUAT_PHAT = 2;
+    private final int PLACE_AUTOCOMPLETE_DIA_DIEM_DEN = 3;
 
+    private LatLng DiaDiemXuatPhat = null;
+    private LatLng DiaDiemDen = null;
+    private Marker marker = null;
+
+    private int DIA_DIEM_DUOC_CHON = 0;
+    private final  int DIA_DIEM_DEN = 1;
+    private final int DIA_DIEM_XUAT_PHAT = 2;
 
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        inItToolBar("");
+        if (!isGooglePlayServiceAvailable())
+        {
+            Toast.makeText(this, "Google Play Service Không hỗ trợ", Toast.LENGTH_SHORT).show();
+            finish();
+        }
 
         AnhXa();
         ThemSuKien();
 
-        if (!isGooglePlayServiceAvailable())
-            finish();
+        inItToolBar("");
+
         MapFragment mapFragment = (MapFragment) getFragmentManager()
                 .findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
@@ -85,6 +110,9 @@ public class MainActivity extends BaseActivity implements View.OnClickListener, 
         fBtnTimDuong.setOnClickListener(this);
         fBtnThemDiaDiem.setOnClickListener(this);
         fBtnMyLoacation.setOnClickListener(this);
+        cddBtnOk.setOnClickListener(this);
+        cddBtnThoat.setOnClickListener(this);
+        lnChonDiaDiem.setVisibility(View.INVISIBLE);
     }
 
     private void AnhXa() {
@@ -95,6 +123,9 @@ public class MainActivity extends BaseActivity implements View.OnClickListener, 
         fBtnThemDiaDiem = floatingActionMenu.findViewById(R.id.fabBtnThemDiaDiem);
         fBtnTimDuong = floatingActionMenu.findViewById(R.id.fabBtnTimDuong);
         fBtnMyLoacation = findViewById(R.id.fBtnMyLocation);
+        lnChonDiaDiem = findViewById(R.id.lnChonDiaDiem);
+        cddBtnOk = findViewById(R.id.cddBtnOk);
+        cddBtnThoat = findViewById(R.id.cddBtnThoat);
     }
 
     @Override
@@ -131,7 +162,7 @@ public class MainActivity extends BaseActivity implements View.OnClickListener, 
             }
             break;
             case R.id.fabBtnTimDuong: {
-                Toast.makeText(this, "Tim duong", Toast.LENGTH_SHORT).show();
+               ShowDialogTimDuong();
             }
             break;
             case R.id.fBtnMyLocation: {
@@ -157,8 +188,123 @@ public class MainActivity extends BaseActivity implements View.OnClickListener, 
                 }
             }
             break;
+            case R.id.fBtnChonDiaDiemXuatPhat:
+            {
+                dialog_timDuong.hide();
+                DIA_DIEM_DUOC_CHON = DIA_DIEM_XUAT_PHAT;
+                TaoMarkerChonDiaDiemTrenBanDo();
+            }
+            break;
+            case R.id.fBtnChonDiaDiemDen:
+            {
+                dialog_timDuong.hide();
+                DIA_DIEM_DUOC_CHON = DIA_DIEM_DEN;
+                TaoMarkerChonDiaDiemTrenBanDo();
+            }
+            break;
+            case R.id.dialog_btnThoat:
+            {
+                dialog_timDuong.dismiss();
+                if(DiaDiemXuatPhat != null) {
+                    DiaDiemXuatPhat = null;
+                }
+                if(DiaDiemDen !=null) {
+                    DiaDiemDen = null;
+                }
+            }
+            break;
+            case R.id.dialog_btnTimDuong:
+            {
+                if(DiaDiemXuatPhat == null || DiaDiemDen == null){
+                    Toast.makeText(this, "Chưa chọn địa điểm",Toast.LENGTH_SHORT).show();
+                }
+                else {
+                    dialog_timDuong.dismiss();
+                    DiaDiemDen = null;
+                    DiaDiemXuatPhat = null;
+                    TimDuongDi();
+                }
+            }
+            break;
+            //            Cdd :Chọn địa điểm
+            case R.id.cddBtnOk:
+            {
+                if(DIA_DIEM_DUOC_CHON == DIA_DIEM_DEN) {
+                    DiaDiemDen = marker.getPosition();
+                    edDiaDiemDen.setText("[Điểm Tọa Độ]");
+                }
+                if(DIA_DIEM_DUOC_CHON == DIA_DIEM_XUAT_PHAT) {
+                    DiaDiemXuatPhat = marker.getPosition();
+                    edDiaDiemXuatPhat.setText("[Điểm Tọa Độ]");
+                }
+                HienLaiDialogSauKhiChonDiaDiem();
+            }
+            break;
+            case R.id.cddBtnThoat:
+            {
+                DIA_DIEM_DUOC_CHON = 0;
+                HienLaiDialogSauKhiChonDiaDiem();
+            }
+            break;
+            case R.id.edChonDiaDiemDen:
+            {
+                MoPlaceAutocomplete(PLACE_AUTOCOMPLETE_DIA_DIEM_DEN);
+            }
+            break;
+            case R.id.edChonDiaDiemXuatPhat:
+            {
+                MoPlaceAutocomplete(PLACE_AUTOCOMPLETE_DIA_DIEMXUAT_PHAT);
+            }
+            break;
         }
 
+    }
+
+    private void HienLaiDialogSauKhiChonDiaDiem() {
+        marker.remove();
+        marker = null;
+        lnChonDiaDiem.setVisibility(View.INVISIBLE);
+        floatingActionMenu.setVisibility(View.VISIBLE);
+        dialog_timDuong.show();
+    }
+
+    private void TaoMarkerChonDiaDiemTrenBanDo() {
+        if(googleMap!=null) {
+            floatingActionMenu.setVisibility(View.INVISIBLE);
+            lnChonDiaDiem.setVisibility(View.VISIBLE);
+            LatLng latLng = googleMap.getCameraPosition().target;
+            if(marker !=null) {
+                marker.remove();
+            }
+            marker = googleMap.addMarker(new MarkerOptions().position(latLng));
+            marker.setIcon(BitmapDescriptorFactory.fromResource(R.drawable.choose_location));
+        }
+    }
+
+    private void TimDuongDi() {
+        Toast.makeText(this, "Tìm đường đi", Toast.LENGTH_SHORT).show();
+    }
+
+    private void ShowDialogTimDuong() {
+        dialog_timDuong = new Dialog(this);
+        dialog_timDuong.requestWindowFeature(Window.FEATURE_NO_TITLE);
+        dialog_timDuong.setContentView(R.layout.custom_dialog_tim_duong);
+        dialog_timDuong.setCanceledOnTouchOutside(false);
+        FloatingActionButton fBtnChonDiemXuatPhat = dialog_timDuong.findViewById(R.id.fBtnChonDiaDiemXuatPhat);
+        FloatingActionButton fBtnChonDiemDen = dialog_timDuong.findViewById(R.id.fBtnChonDiaDiemDen);
+        Button btnTimDuong = dialog_timDuong.findViewById(R.id.dialog_btnTimDuong);
+        Button btnThoat = dialog_timDuong.findViewById(R.id.dialog_btnThoat);
+        edDiaDiemXuatPhat = dialog_timDuong.findViewById(R.id.edChonDiaDiemXuatPhat);
+        edDiaDiemDen = dialog_timDuong.findViewById(R.id.edChonDiaDiemDen);
+        fBtnChonDiemDen.setOnClickListener(this);
+        fBtnChonDiemXuatPhat.setOnClickListener(this);
+        btnTimDuong.setOnClickListener(this);
+        btnThoat.setOnClickListener(this);
+        edDiaDiemXuatPhat.setOnClickListener(this);
+        edDiaDiemXuatPhat.setKeyListener(null);
+        edDiaDiemDen.setOnClickListener(this);
+        edDiaDiemDen.setKeyListener(null);
+        dialog_timDuong.show();
     }
 
     @Override
@@ -174,20 +320,10 @@ public class MainActivity extends BaseActivity implements View.OnClickListener, 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         if (mToggle.onOptionsItemSelected(item)) {
-
             return true;
         }
         if(item.getItemId() == R.id.itsearch){
-            try {
-                Intent intent =
-                        new PlaceAutocomplete.IntentBuilder(PlaceAutocomplete.MODE_FULLSCREEN)
-                                .build(this);
-                startActivityForResult(intent, PLACE_AUTOCOMPLETE_REQUEST_CODE);
-            } catch (GooglePlayServicesRepairableException e) {
-                // TODO: Handle the error.
-            } catch (GooglePlayServicesNotAvailableException e) {
-                // TODO: Handle the error.
-            }
+            MoPlaceAutocomplete(PLACE_AUTOCOMPLETE_REQUEST_CODE);
         }
         return super.onOptionsItemSelected(item);
     }
@@ -229,17 +365,19 @@ public class MainActivity extends BaseActivity implements View.OnClickListener, 
 
     private void ShowDialogChonBanKinh() {
         dialog_chonBanKinh = new Dialog(this);
+        dialog_chonBanKinh.requestWindowFeature(Window.FEATURE_NO_TITLE);
         dialog_chonBanKinh.setContentView(R.layout.dialog_chon_ban_kinh);
         dialog_chonBanKinh.setCanceledOnTouchOutside(false);
         Button btnClose = dialog_chonBanKinh.findViewById(R.id.btnClose_CBK);
         Button btnOk = dialog_chonBanKinh.findViewById(R.id.btnDongY_CBK);
         final TextView textView = dialog_chonBanKinh.findViewById(R.id.txtKMHienThi);
+        textView.setText(String.valueOf(PROXIMITY_RADIUS/1000) + " KM");
         seekBarBanKinh = dialog_chonBanKinh.findViewById(R.id.sbBanKinh);
         seekBarBanKinh.setProgress(PROXIMITY_RADIUS / 1000);
         seekBarBanKinh.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override
             public void onProgressChanged(SeekBar seekBar, int i, boolean b) {
-                String KM = String.valueOf(i) + " KM";
+                String KM = String.valueOf(i) +"KM";
                 textView.setText(KM);
             }
 
@@ -260,6 +398,7 @@ public class MainActivity extends BaseActivity implements View.OnClickListener, 
 
     private void CustomDialog() {
         dialog = new Dialog(this);
+        dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
         dialog.setContentView(R.layout.thongtin_dialog_custom);
         dialog.setCanceledOnTouchOutside(false);
         Button btnQuayLai = (Button) dialog.findViewById(R.id.btnQuayLai);
@@ -281,8 +420,22 @@ public class MainActivity extends BaseActivity implements View.OnClickListener, 
             return;
         }
         googleMap.setMyLocationEnabled(true);
+        googleMap.getUiSettings().setZoomControlsEnabled(false);
+        googleMap.getUiSettings().setMyLocationButtonEnabled(false);
         googleMap.getUiSettings().setMapToolbarEnabled(false);
 
+        googleMap.setOnCameraMoveListener(new GoogleMap.OnCameraMoveListener() {
+            @Override
+            public void onCameraMove() {
+                if(googleMap.getCameraPosition()!=null) {
+                    if(marker!=null) {
+                        if(googleMap.getCameraPosition() != null) {
+                            marker.setPosition(googleMap.getCameraPosition().target);
+                        }
+                    }
+                }
+            }
+        });
         Location location = getLocation();
         if (location == null) {
             Toast.makeText(this, "Không tìm được vị trí của bạn", Toast.LENGTH_SHORT).show();
@@ -401,6 +554,46 @@ public class MainActivity extends BaseActivity implements View.OnClickListener, 
             } else if (resultCode == RESULT_CANCELED) {
                 // The user canceled the operation.
             }
+        }
+        if (requestCode == PLACE_AUTOCOMPLETE_DIA_DIEM_DEN) {
+            if (resultCode == RESULT_OK) {
+                Place place = PlaceAutocomplete.getPlace(this, data);
+                edDiaDiemDen.setText(place.getName());
+            } else if (resultCode == PlaceAutocomplete.RESULT_ERROR) {
+                Status status = PlaceAutocomplete.getStatus(this, data);
+                // TODO: Handle the error.
+                Toast.makeText(this, "Lỗi, cần chỉnh sửa", Toast.LENGTH_SHORT).show();
+
+            } else if (resultCode == RESULT_CANCELED) {
+                // The user canceled the operation.
+            }
+        }
+        if (requestCode == PLACE_AUTOCOMPLETE_DIA_DIEMXUAT_PHAT) {
+            if (resultCode == RESULT_OK) {
+                Place place = PlaceAutocomplete.getPlace(this, data);
+                edDiaDiemXuatPhat.setText(place.getName());
+            } else if (resultCode == PlaceAutocomplete.RESULT_ERROR) {
+                Status status = PlaceAutocomplete.getStatus(this, data);
+                // TODO: Handle the error.
+                Toast.makeText(this, "Lỗi, cần chỉnh sửa", Toast.LENGTH_SHORT).show();
+
+            } else if (resultCode == RESULT_CANCELED) {
+                // The user canceled the operation.
+            }
+        }
+
+    }
+
+    private void MoPlaceAutocomplete(int requestCode) {
+        try {
+            Intent intent =
+                    new PlaceAutocomplete.IntentBuilder(PlaceAutocomplete.MODE_FULLSCREEN)
+                            .build(this);
+            startActivityForResult(intent,requestCode);
+        } catch (GooglePlayServicesRepairableException e) {
+            // TODO: Handle the error.
+        } catch (GooglePlayServicesNotAvailableException e) {
+            // TODO: Handle the error.
         }
     }
 }
