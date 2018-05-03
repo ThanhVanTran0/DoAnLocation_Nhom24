@@ -2,12 +2,13 @@ package com.example.thanh.doanlocation_nhom24;
 
 import android.content.Intent;
 import android.net.Uri;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.EditText;
 import android.widget.Toast;
+
+import Modules.BaseActivity;
 
 public class PhanHoiActivity extends BaseActivity {
 

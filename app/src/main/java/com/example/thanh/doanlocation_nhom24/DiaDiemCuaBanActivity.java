@@ -6,6 +6,9 @@ import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
 
+import Adapter.PageAdapter;
+import Modules.BaseActivity;
+
 public class DiaDiemCuaBanActivity extends BaseActivity {
 
     private TabLayout tabLayout;

@@ -1,8 +1,11 @@
-package com.example.thanh.doanlocation_nhom24;
+package Adapter;
 
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentStatePagerAdapter;
+
+import com.example.thanh.doanlocation_nhom24.TabDiaDiemSeDen;
+import com.example.thanh.doanlocation_nhom24.TabYeuThich;
 
 //Dùng để điều khiển 2 tab
 public class PageAdapter extends FragmentStatePagerAdapter {

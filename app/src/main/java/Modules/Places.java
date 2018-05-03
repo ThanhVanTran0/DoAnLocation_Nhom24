@@ -1,4 +1,4 @@
-package com.example.thanh.doanlocation_nhom24;
+package Modules;
 
 import org.json.JSONArray;
 import org.json.JSONException;

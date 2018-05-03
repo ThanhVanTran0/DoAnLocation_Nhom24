@@ -1,4 +1,4 @@
-package com.example.thanh.doanlocation_nhom24;
+package Models;
 
 /**
  * Created by Thanh on 4/30/2018.

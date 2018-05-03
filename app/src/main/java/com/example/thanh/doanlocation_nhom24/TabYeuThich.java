@@ -1,7 +1,5 @@
 package com.example.thanh.doanlocation_nhom24;
 
-import android.content.Context;
-import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
@@ -10,6 +8,9 @@ import android.view.ViewGroup;
 import android.widget.ListView;
 
 import java.util.ArrayList;
+
+import Adapter.CustomAdapter;
+import Models.DiaDiemUaThich;
 
 public class TabYeuThich extends Fragment {
     // TODO: Rename parameter arguments, choose names that match

@@ -4,6 +4,7 @@ import android.Manifest;
 import android.app.Dialog;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.graphics.Color;
 import android.location.Criteria;
 import android.location.Location;
 import android.location.LocationListener;
@@ -20,7 +21,6 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.Window;
-import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.LinearLayout;
@@ -36,21 +36,32 @@ import com.google.android.gms.common.GooglePlayServicesRepairableException;
 import com.google.android.gms.common.GooglePlayServicesUtil;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.common.api.Status;
+import com.google.android.gms.location.places.AutocompleteFilter;
 import com.google.android.gms.location.places.Place;
 import com.google.android.gms.location.places.ui.PlaceAutocomplete;
-import com.google.android.gms.location.places.ui.PlacePicker;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapFragment;
 import com.google.android.gms.maps.OnMapReadyCallback;
-import com.google.android.gms.maps.model.BitmapDescriptor;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.android.gms.maps.model.Polyline;
+import com.google.android.gms.maps.model.PolylineOptions;
+
+import java.io.UnsupportedEncodingException;
+import java.util.ArrayList;
+import java.util.List;
+
+import Modules.BaseActivity;
+import Modules.DirectionFinder;
+import Modules.DirectionFinderListener;
+import Modules.GooglePlacesReadTask;
+import Modules.Route;
 
 //Activity Trang chu
-public class MainActivity extends BaseActivity implements View.OnClickListener, NavigationView.OnNavigationItemSelectedListener, OnMapReadyCallback, LocationListener {
+public class MainActivity extends BaseActivity implements View.OnClickListener, NavigationView.OnNavigationItemSelectedListener, OnMapReadyCallback, LocationListener, DirectionFinderListener {
     private DrawerLayout drawerLayout;
     private ActionBarDrawerToggle mToggle;
     private NavigationView navigationView;
@@ -79,6 +90,10 @@ public class MainActivity extends BaseActivity implements View.OnClickListener, 
     private int DIA_DIEM_DUOC_CHON = 0;
     private final  int DIA_DIEM_DEN = 1;
     private final int DIA_DIEM_XUAT_PHAT = 2;
+
+    private List<Marker> originMarkers = new ArrayList<>();
+    private List<Marker> destinationMarkers = new ArrayList<>();
+    private List<Polyline> polylinePaths = new ArrayList<>();
 
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -183,8 +198,8 @@ public class MainActivity extends BaseActivity implements View.OnClickListener, 
                         // for ActivityCompat#requestPermissions for more details.
                         return;
                     }
-                    googleMap.setMyLocationEnabled(true);
                     googleMap.animateCamera(CameraUpdateFactory.newLatLngZoom(latLng, 13), 1500, null);
+                    googleMap.setMyLocationEnabled(true);
                 }
             }
             break;
@@ -219,10 +234,10 @@ public class MainActivity extends BaseActivity implements View.OnClickListener, 
                     Toast.makeText(this, "Chưa chọn địa điểm",Toast.LENGTH_SHORT).show();
                 }
                 else {
+                    TimDuongDi();
                     dialog_timDuong.dismiss();
                     DiaDiemDen = null;
                     DiaDiemXuatPhat = null;
-                    TimDuongDi();
                 }
             }
             break;
@@ -282,7 +297,12 @@ public class MainActivity extends BaseActivity implements View.OnClickListener, 
     }
 
     private void TimDuongDi() {
-        Toast.makeText(this, "Tìm đường đi", Toast.LENGTH_SHORT).show();
+        try {
+            new DirectionFinder(this,DiaDiemXuatPhat,DiaDiemDen).execute();
+        }
+        catch (UnsupportedEncodingException e) {
+            e.printStackTrace();
+        }
     }
 
     private void ShowDialogTimDuong() {
@@ -443,8 +463,8 @@ public class MainActivity extends BaseActivity implements View.OnClickListener, 
             double latitude = location.getLatitude();
             double longitude = location.getLongitude();
             LatLng latLng = new LatLng(latitude, longitude);
-            googleMap.setMyLocationEnabled(true);
             googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng, 13));
+            googleMap.setMyLocationEnabled(true);
         }
     }
 
@@ -559,6 +579,7 @@ public class MainActivity extends BaseActivity implements View.OnClickListener, 
             if (resultCode == RESULT_OK) {
                 Place place = PlaceAutocomplete.getPlace(this, data);
                 edDiaDiemDen.setText(place.getName());
+                DiaDiemDen = place.getLatLng();
             } else if (resultCode == PlaceAutocomplete.RESULT_ERROR) {
                 Status status = PlaceAutocomplete.getStatus(this, data);
                 // TODO: Handle the error.
@@ -572,6 +593,7 @@ public class MainActivity extends BaseActivity implements View.OnClickListener, 
             if (resultCode == RESULT_OK) {
                 Place place = PlaceAutocomplete.getPlace(this, data);
                 edDiaDiemXuatPhat.setText(place.getName());
+                DiaDiemXuatPhat = place.getLatLng();
             } else if (resultCode == PlaceAutocomplete.RESULT_ERROR) {
                 Status status = PlaceAutocomplete.getStatus(this, data);
                 // TODO: Handle the error.
@@ -586,14 +608,51 @@ public class MainActivity extends BaseActivity implements View.OnClickListener, 
 
     private void MoPlaceAutocomplete(int requestCode) {
         try {
+            AutocompleteFilter autocompleteFilter = new AutocompleteFilter.Builder().setCountry("VN").build();
             Intent intent =
                     new PlaceAutocomplete.IntentBuilder(PlaceAutocomplete.MODE_FULLSCREEN)
+                            .setFilter(autocompleteFilter)
                             .build(this);
             startActivityForResult(intent,requestCode);
         } catch (GooglePlayServicesRepairableException e) {
             // TODO: Handle the error.
         } catch (GooglePlayServicesNotAvailableException e) {
             // TODO: Handle the error.
+        }
+    }
+
+    @Override
+    public void onDirectionFinderStart() {
+
+    }
+
+    @Override
+    public void onDirectionFinderSuccess(List<Route> routes) {
+        polylinePaths = new ArrayList<>();
+        originMarkers = new ArrayList<>();
+        destinationMarkers = new ArrayList<>();
+        googleMap.clear();
+
+        for (Route route : routes) {
+            googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(route.startLocation, 16));
+            originMarkers.add(googleMap.addMarker(new MarkerOptions()
+                    .icon(BitmapDescriptorFactory.fromResource(R.drawable.ic_location_start))
+                    .title(route.startAddress)
+                    .position(route.startLocation)));
+            destinationMarkers.add(googleMap.addMarker(new MarkerOptions()
+                    .icon(BitmapDescriptorFactory.fromResource(R.drawable.ic_location_end))
+                    .title(route.endAddress)
+                    .position(route.endLocation)));
+
+            PolylineOptions polylineOptions = new PolylineOptions().
+                    geodesic(true).
+                    color(Color.BLUE).
+                    width(10);
+
+            for (int i = 0; i < route.points.size(); i++)
+                polylineOptions.add(route.points.get(i));
+
+            polylinePaths.add(googleMap.addPolyline(polylineOptions));
         }
     }
 }

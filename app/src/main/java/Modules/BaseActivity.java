@@ -1,10 +1,12 @@
-package com.example.thanh.doanlocation_nhom24;
+package Modules;
 
 import android.os.Bundle;
 import android.os.PersistableBundle;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+
+import com.example.thanh.doanlocation_nhom24.R;
 
 /**
  * Created by Thanh on 4/26/2018.
