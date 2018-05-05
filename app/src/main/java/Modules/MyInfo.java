@@ -12,19 +12,20 @@ import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 
+import Models.DiaDiem;
+
 /**
  * Created by Phan Thao on 5/4/2018.
  */
 
-class MyInfo implements GoogleMap.InfoWindowAdapter {
+public class MyInfo implements GoogleMap.InfoWindowAdapter {
     private Activity context;
-    private Bitmap btm;
     private View mWindow;
+    private DiaDiem diaDiem = null;
 
-    public MyInfo(Activity context, Bitmap result)
+    public MyInfo(Activity context)
     {
         this.context=context;
-        this.btm=result;
         mWindow = LayoutInflater.from(context).inflate(R.layout.custom_maker,null);
     }
 
@@ -33,7 +34,13 @@ class MyInfo implements GoogleMap.InfoWindowAdapter {
         TextView name = (TextView) v.findViewById(R.id.name);
         ImageView img=(ImageView) v.findViewById(R.id.img);
         name.setText(marker.getTitle());
-        img.setImageBitmap((Bitmap) marker.getTag());
+        diaDiem = (DiaDiem) marker.getTag();
+        if(diaDiem.getImgDiaDiem() != null) {
+            img.setImageBitmap(diaDiem.getImgDiaDiem());
+        }
+        else {
+            img.setImageResource(R.drawable.img_noimage);
+        }
     }
 
     @Override

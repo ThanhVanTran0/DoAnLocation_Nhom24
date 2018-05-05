@@ -4,6 +4,7 @@ import android.Manifest;
 import android.app.Dialog;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.location.Criteria;
 import android.location.Location;
@@ -37,7 +38,13 @@ import com.google.android.gms.common.GooglePlayServicesUtil;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.common.api.Status;
 import com.google.android.gms.location.places.AutocompleteFilter;
+import com.google.android.gms.location.places.GeoDataClient;
 import com.google.android.gms.location.places.Place;
+import com.google.android.gms.location.places.PlacePhotoMetadata;
+import com.google.android.gms.location.places.PlacePhotoMetadataBuffer;
+import com.google.android.gms.location.places.PlacePhotoMetadataResponse;
+import com.google.android.gms.location.places.PlacePhotoResponse;
+import com.google.android.gms.location.places.Places;
 import com.google.android.gms.location.places.ui.PlaceAutocomplete;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
@@ -49,15 +56,19 @@ import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.Polyline;
 import com.google.android.gms.maps.model.PolylineOptions;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
 
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.List;
 
+import Models.DiaDiem;
 import Modules.BaseActivity;
 import Modules.DirectionFinder;
 import Modules.DirectionFinderListener;
 import Modules.GooglePlacesReadTask;
+import Modules.MyInfo;
 import Modules.Route;
 
 //Activity Trang chu
@@ -67,7 +78,7 @@ public class MainActivity extends BaseActivity implements View.OnClickListener, 
     private NavigationView navigationView;
     private FloatingActionMenu floatingActionMenu;
     private com.github.clans.fab.FloatingActionButton fBtnTimDuong, fBtnThemDiaDiem, fBtnMyLoacation;
-    private Dialog dialog, dialog_chonBanKinh,dialog_timDuong;
+    private Dialog dialog, dialog_chonBanKinh,dialog_timDuong,dialog_chonLoaiDiaDiem;
     private GoogleApiClient googleApiClient;
     private GoogleMap googleMap;
     private double latitude = 0;
@@ -95,6 +106,10 @@ public class MainActivity extends BaseActivity implements View.OnClickListener, 
     private List<Marker> destinationMarkers = new ArrayList<>();
     private List<Polyline> polylinePaths = new ArrayList<>();
 
+    private Marker myMarker = null;
+    private DiaDiem diaDiemCanThem = null;
+    private GeoDataClient mGeoDataClient;
+
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
@@ -113,6 +128,9 @@ public class MainActivity extends BaseActivity implements View.OnClickListener, 
         MapFragment mapFragment = (MapFragment) getFragmentManager()
                 .findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
+
+        // Construct a GeoDataClient.
+        mGeoDataClient = Places.getGeoDataClient(this, null);
     }
 
     private void ThemSuKien() {
@@ -173,7 +191,13 @@ public class MainActivity extends BaseActivity implements View.OnClickListener, 
             }
             break;
             case R.id.fabBtnThemDiaDiem: {
-
+                if(diaDiemCanThem == null) {
+                    Toast.makeText(this, "Bạn chưa chọn địa điểm. Hãy chọn một địa điểm được đánh dấu.", Toast.LENGTH_SHORT).show();
+                }
+                else {
+                    floatingActionMenu.close(true);
+                    ShowDialogChonLoaiDiaDiem();
+                }
             }
             break;
             case R.id.fabBtnTimDuong: {
@@ -271,8 +295,37 @@ public class MainActivity extends BaseActivity implements View.OnClickListener, 
                 MoPlaceAutocomplete(PLACE_AUTOCOMPLETE_DIA_DIEMXUAT_PHAT);
             }
             break;
+            case R.id.dialog_lua_chon_btnThoat:
+            {
+                dialog_chonLoaiDiaDiem.dismiss();
+            }
+            break;
+            case R.id.dialog_dudinhtoi:
+            {
+
+            }
+            break;
+            case R.id.dialog_yeuThich:
+            {
+
+            }
+            break;
         }
 
+    }
+
+    private void ShowDialogChonLoaiDiaDiem() {
+        dialog_chonLoaiDiaDiem = new Dialog(this);
+        dialog_chonLoaiDiaDiem.requestWindowFeature(Window.FEATURE_NO_TITLE);
+        dialog_chonLoaiDiaDiem.setContentView(R.layout.custom_dialog_dia_diem_cua_ban);
+        dialog_chonLoaiDiaDiem.setCanceledOnTouchOutside(false);
+        Button btnThoat = dialog_chonLoaiDiaDiem.findViewById(R.id.dialog_lua_chon_btnThoat);
+        LinearLayout dialog_yeuThich = dialog_chonLoaiDiaDiem.findViewById(R.id.dialog_yeuThich);
+        LinearLayout dialog_dudinhtoi = dialog_chonLoaiDiaDiem.findViewById(R.id.dialog_dudinhtoi);
+        btnThoat.setOnClickListener(this);
+        dialog_yeuThich.setOnClickListener(this);
+        dialog_dudinhtoi.setOnClickListener(this);
+        dialog_chonLoaiDiaDiem.show();
     }
 
     private void HienLaiDialogSauKhiChonDiaDiem() {
@@ -457,6 +510,21 @@ public class MainActivity extends BaseActivity implements View.OnClickListener, 
                 }
             }
         });
+
+        googleMap.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
+            @Override
+            public boolean onMarkerClick(Marker marker) {
+                diaDiemCanThem = (DiaDiem) marker.getTag();
+                return false;
+            }
+        });
+
+        googleMap.setOnMapClickListener(new GoogleMap.OnMapClickListener() {
+            @Override
+            public void onMapClick(LatLng latLng) {
+                diaDiemCanThem = null;
+            }
+        });
         Location location = getLocation();
         if (location == null) {
             Toast.makeText(this, "Không tìm được vị trí của bạn", Toast.LENGTH_SHORT).show();
@@ -561,9 +629,13 @@ public class MainActivity extends BaseActivity implements View.OnClickListener, 
                 Toast.makeText(this, place.getName(), Toast.LENGTH_SHORT).show();
                 googleMap.clear();
                 LatLng latLng = place.getLatLng();
+                getPhotos(place.getId());
                 MarkerOptions markerOptions = new MarkerOptions();
                 markerOptions.position(latLng);
-                googleMap.addMarker(markerOptions);
+                markerOptions.title(place.getName().toString() + "\n"+ place.getAddress().toString());
+                DiaDiem diaDiem = new DiaDiem(null,latLng,place.getAddress().toString(),place.getName().toString());
+                myMarker = googleMap.addMarker(markerOptions);
+                myMarker.setTag(diaDiem);
                 googleMap.animateCamera(CameraUpdateFactory.newLatLngZoom(latLng, 13), 1500, null);
 
             } else if (resultCode == PlaceAutocomplete.RESULT_ERROR) {
@@ -654,5 +726,33 @@ public class MainActivity extends BaseActivity implements View.OnClickListener, 
 
             polylinePaths.add(googleMap.addPolyline(polylineOptions));
         }
+    }
+
+    private void getPhotos(String place_id) {
+        final String placeId = place_id;
+        final MyInfo info = new MyInfo(this);
+        final Task<PlacePhotoMetadataResponse> photoMetadataResponse = mGeoDataClient.getPlacePhotos(placeId);
+        photoMetadataResponse.addOnCompleteListener(new OnCompleteListener<PlacePhotoMetadataResponse>() {
+            @Override
+            public void onComplete(@NonNull Task<PlacePhotoMetadataResponse> task) {
+                // Get the list of photos.
+                PlacePhotoMetadataResponse photos = task.getResult();
+                // Get the PlacePhotoMetadataBuffer (metadata for all of the photos).
+                PlacePhotoMetadataBuffer photoMetadataBuffer = photos.getPhotoMetadata();
+                // Get the first photo in the list.
+                PlacePhotoMetadata photoMetadata = photoMetadataBuffer.get(0);
+                Task<PlacePhotoResponse> photoResponse = mGeoDataClient.getPhoto(photoMetadata);
+                photoResponse.addOnCompleteListener(new OnCompleteListener<PlacePhotoResponse>() {
+                    @Override
+                    public void onComplete(@NonNull Task<PlacePhotoResponse> task) {
+                        PlacePhotoResponse photo = task.getResult();
+                        Bitmap bitmap = photo.getBitmap();
+                        DiaDiem diaDiem = (DiaDiem) myMarker.getTag();
+                        diaDiem.setImgDiaDiem(bitmap);
+                        googleMap.setInfoWindowAdapter(info);
+                    }
+                });
+            }
+        });
     }
 }

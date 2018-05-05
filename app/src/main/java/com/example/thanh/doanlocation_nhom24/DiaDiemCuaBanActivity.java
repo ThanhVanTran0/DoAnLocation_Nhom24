@@ -13,6 +13,7 @@ public class DiaDiemCuaBanActivity extends BaseActivity {
 
     private TabLayout tabLayout;
     private ViewPager viewPager;
+    private PageAdapter adapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -25,11 +26,13 @@ public class DiaDiemCuaBanActivity extends BaseActivity {
         setupViewPapge(viewPager);
         tabLayout.setupWithViewPager(viewPager);
 
+
+
     }
 
 
     private void setupViewPapge(ViewPager viewPager) {
-        PageAdapter adapter = new PageAdapter(getSupportFragmentManager());
+        adapter = new PageAdapter(getSupportFragmentManager());
         viewPager.setAdapter(adapter);
         viewPager.setOffscreenPageLimit(2);
     }

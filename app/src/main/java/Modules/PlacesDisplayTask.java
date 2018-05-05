@@ -13,6 +13,8 @@ import org.json.JSONObject;
 import java.util.HashMap;
 import java.util.List;
 
+import Models.DiaDiem;
+
 /**
  * Created by nguyenthang on 4/19/18.
  */
@@ -54,7 +56,9 @@ public class PlacesDisplayTask extends AsyncTask<Object, Integer, List<HashMap<S
                 LatLng latLng = new LatLng(lat, lng);
                 markerOptions.position(latLng);
                 markerOptions.title(placeName+"\n"+vicinity+"\nRating: "+rating);
+                DiaDiem diaDiem = new DiaDiem(null,latLng,vicinity,placeName);
                 Marker marker = googleMap.addMarker(markerOptions);
+                marker.setTag(diaDiem);
                 imgTask = new ImageLoad(Context, photo, googleMap, marker);
                 imgTask.execute();
             }

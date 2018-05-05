@@ -12,6 +12,8 @@ import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
 
+import Models.DiaDiem;
+
 /**
  * Created by Phan Thao on 5/4/2018.
  */
@@ -58,8 +60,8 @@ public class ImageLoad extends AsyncTask<Void,Void,Bitmap> {
     @Override
     protected void onPostExecute(Bitmap bitmap) {
         super.onPostExecute(bitmap);
-        currentMarker.setTag(bitmap);
-        map.setInfoWindowAdapter(new MyInfo(context,bitmap));
-      //  currentMarker.showInfoWindow();
+        DiaDiem diaDiem = (DiaDiem) currentMarker.getTag();
+        diaDiem.setImgDiaDiem(bitmap);
+        map.setInfoWindowAdapter(new MyInfo(context));
     }
 }
