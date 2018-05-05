@@ -10,7 +10,8 @@ import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import Models.DiaDiemUaThich;
+import Models.DiaDiem;
+
 import com.example.thanh.doanlocation_nhom24.R;
 
 import java.util.List;
@@ -19,13 +20,13 @@ import java.util.List;
  * Created by Thanh on 4/30/2018.
  */
 
-public class CustomAdapter extends ArrayAdapter<DiaDiemUaThich> {
+public class CustomAdapter extends ArrayAdapter<DiaDiem> {
 
     private Context context;
     private int Resource;
-    private List<DiaDiemUaThich> objects;
+    private List<DiaDiem> objects;
 
-    public CustomAdapter(@NonNull Context context, int resource, @NonNull List<DiaDiemUaThich> objects) {
+    public CustomAdapter(@NonNull Context context, int resource, @NonNull List<DiaDiem> objects) {
         super(context, resource, objects);
         this.context = context;
         this.Resource = resource;
@@ -53,11 +54,11 @@ public class CustomAdapter extends ArrayAdapter<DiaDiemUaThich> {
             viewHolder = (ViewHolder) convertView.getTag();
         }
 
-        DiaDiemUaThich diaDiemUaThich = objects.get(position);
-        viewHolder.imgDiaDiem.setImageResource(diaDiemUaThich.getImage());
-        viewHolder.imgLoaiCuaHang.setImageResource(diaDiemUaThich.getImgLoaiDiaDiem());
-        viewHolder.txtTenCuaHang.setText(diaDiemUaThich.getTenCuaHang());
-        viewHolder.txtViTri.setText(diaDiemUaThich.getViTri());
+//        DiaDiem diaDiemUaThich = objects.get(position);
+//        viewHolder.imgDiaDiem.setImageResource(diaDiemUaThich.getImage());
+//        viewHolder.imgLoaiCuaHang.setImageResource(diaDiemUaThich.getImgLoaiDiaDiem());
+//        viewHolder.txtTenCuaHang.setText(diaDiemUaThich.getTenCuaHang());
+//        viewHolder.txtViTri.setText(diaDiemUaThich.getViTri());
         return convertView;
     }
 

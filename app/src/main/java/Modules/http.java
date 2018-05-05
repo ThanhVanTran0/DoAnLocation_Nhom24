@@ -15,6 +15,10 @@ import java.net.URL;
 
 public class http {
 
+    public http() {
+
+    }
+
     public String read(String httpUrl) throws IOException {
         String httpData = "";
         InputStream inputStream = null;
@@ -36,10 +40,10 @@ public class http {
             e.printStackTrace();
         } finally {
             inputStream.close();
+
             httpURLConnection.disconnect();
         }
         Log.e("httpData", httpData);
         return httpData;
-
     }
 }

@@ -1,5 +1,6 @@
 package Modules;
 
+import android.app.Activity;
 import android.os.AsyncTask;
 import android.util.Log;
 
@@ -12,6 +13,11 @@ import com.google.android.gms.maps.GoogleMap;
 public class GooglePlacesReadTask extends AsyncTask<Object, Integer, String> {
     String googlePlacesData = null;
     GoogleMap googleMap;
+    Activity Context;
+
+   public GooglePlacesReadTask(Activity context){
+       this.Context=context;
+   }
 
     @Override
     protected String doInBackground(Object... inputObj) {
@@ -28,10 +34,11 @@ public class GooglePlacesReadTask extends AsyncTask<Object, Integer, String> {
 
     @Override
     protected void onPostExecute(String result) {
-        PlacesDisplayTask placesDisplayTask = new PlacesDisplayTask();
+        PlacesDisplayTask placesDisplayTask = new PlacesDisplayTask(Context);
         Object[] toPass = new Object[2];
         toPass[0] = googleMap;
         toPass[1] = result;
         placesDisplayTask.execute(toPass);
     }
+
 }

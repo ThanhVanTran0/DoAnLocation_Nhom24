@@ -173,7 +173,7 @@ public class MainActivity extends BaseActivity implements View.OnClickListener, 
             }
             break;
             case R.id.fabBtnThemDiaDiem: {
-                Toast.makeText(this, "Them dia diem", Toast.LENGTH_SHORT).show();
+
             }
             break;
             case R.id.fabBtnTimDuong: {
@@ -306,6 +306,7 @@ public class MainActivity extends BaseActivity implements View.OnClickListener, 
     }
 
     private void ShowDialogTimDuong() {
+        floatingActionMenu.close(true);
         dialog_timDuong = new Dialog(this);
         dialog_timDuong.requestWindowFeature(Window.FEATURE_NO_TITLE);
         dialog_timDuong.setContentView(R.layout.custom_dialog_tim_duong);
@@ -543,9 +544,8 @@ public class MainActivity extends BaseActivity implements View.OnClickListener, 
         googlePlacesUrl.append("&sensor=true");
         googlePlacesUrl.append("&key=" + "AIzaSyDviXBV3UhvjTvNkDrZvv5i9sg_9Ekxwuo");
         //Mượn tạm api của thắng
-        String a = googlePlacesUrl.toString();
         Log.e("URL", googlePlacesUrl.toString());
-        GooglePlacesReadTask googlePlacesReadTask = new GooglePlacesReadTask();
+        GooglePlacesReadTask googlePlacesReadTask = new GooglePlacesReadTask(this);
         Object[] toPass = new Object[2];
         toPass[0] = googleMap;
         toPass[1] = googlePlacesUrl.toString();
@@ -647,7 +647,7 @@ public class MainActivity extends BaseActivity implements View.OnClickListener, 
             PolylineOptions polylineOptions = new PolylineOptions().
                     geodesic(true).
                     color(Color.BLUE).
-                    width(10);
+                    width(13);
 
             for (int i = 0; i < route.points.size(); i++)
                 polylineOptions.add(route.points.get(i));
