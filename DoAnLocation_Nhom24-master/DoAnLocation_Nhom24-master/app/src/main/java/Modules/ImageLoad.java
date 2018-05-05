@@ -4,10 +4,16 @@ import android.app.Activity;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.AsyncTask;
+import android.os.UserManager;
 import android.support.annotation.NonNull;
+import android.view.View;
+import android.widget.ImageView;
+import android.widget.TextView;
 
+import com.example.thanh.doanlocation_nhom24.R;
 import com.google.android.gms.location.places.*;
 import com.google.android.gms.maps.GoogleMap;
+import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
@@ -19,7 +25,6 @@ import java.net.URL;
 /**
  * Created by Phan Thao on 5/4/2018.
  */
-
 public class ImageLoad extends AsyncTask<Void,Void,Bitmap> {
     private String url;
     private GoogleMap map;
@@ -63,7 +68,7 @@ public class ImageLoad extends AsyncTask<Void,Void,Bitmap> {
     @Override
     protected void onPostExecute(Bitmap bitmap) {
         super.onPostExecute(bitmap);
-     //   map.setInfoWindowAdapter(new MyInfo(context,bitmap));
+        map.setInfoWindowAdapter(new MyInfo(context,bitmap));
       //  currentMarker.showInfoWindow();
     }
 }

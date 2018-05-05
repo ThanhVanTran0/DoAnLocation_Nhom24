@@ -16,6 +16,7 @@ import com.google.android.gms.tasks.Task;
 import org.json.JSONObject;
 
 import java.util.HashMap;
+import java.util.Hashtable;
 import java.util.List;
 
 /**

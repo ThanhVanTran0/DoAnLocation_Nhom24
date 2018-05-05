@@ -23,7 +23,6 @@ import android.view.View;
 import android.view.Window;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.SeekBar;
 import android.widget.TextView;
@@ -56,11 +55,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 import Modules.BaseActivity;
-import Modules.CustomInfoWindowAdapter;
 import Modules.DirectionFinder;
 import Modules.DirectionFinderListener;
 import Modules.GooglePlacesReadTask;
-import Modules.ImageLoad;
 import Modules.Route;
 
 //Activity Trang chu
@@ -180,7 +177,7 @@ public class MainActivity extends BaseActivity implements View.OnClickListener, 
             }
             break;
             case R.id.fabBtnTimDuong: {
-               ShowDialogTimDuong();
+                ShowDialogTimDuong();
             }
             break;
             case R.id.fBtnMyLocation: {
@@ -468,12 +465,6 @@ public class MainActivity extends BaseActivity implements View.OnClickListener, 
             LatLng latLng = new LatLng(latitude, longitude);
             googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng, 13));
             googleMap.setMyLocationEnabled(true);
-              MarkerOptions option=new MarkerOptions();
-            option.position(latLng);
-            CustomInfoWindowAdapter adapter = new CustomInfoWindowAdapter(MainActivity.this);
-            map.setInfoWindowAdapter(adapter);
-            Marker m = map.addMarker(option);
-            m.showInfoWindow();
         }
     }
 

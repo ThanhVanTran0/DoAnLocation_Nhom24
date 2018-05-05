@@ -1,15 +1,16 @@
-package Modules;
 
-import android.provider.Contacts;
+        package Modules;
 
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
+        import android.provider.Contacts;
 
-import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
+        import org.json.JSONArray;
+        import org.json.JSONException;
+        import org.json.JSONObject;
+
+        import java.io.Serializable;
+        import java.util.ArrayList;
+        import java.util.HashMap;
+        import java.util.List;
 
 /**
  * Created by nguyenthang on 4/19/18.
@@ -65,10 +66,10 @@ public class Places {
                 JSONArray photos = googlePlaceJson.getJSONArray("photos");
                 JSONObject pt = photos.getJSONObject(0);
                 photo="https://maps.googleapis.com/maps/api/place/photo?maxwidth=500&photoreference="+ pt.getString("photo_reference")
-                        +"&sensor=true&key=AIzaSyDviXBV3UhvjTvNkDrZvv5i9sg_9Ekxwuo";
+                        +"&sensor=true&key=AIzaSyD73ix-2OxsdM03JnoTj5gbxwbPRAJZSiM";
             }
             if (!googlePlaceJson.isNull("rating")) {
-                 rating= googlePlaceJson.getDouble("rating");
+                rating= googlePlaceJson.getDouble("rating");
             }
             googlePlaceMap.put("place_name", placeName);
             googlePlaceMap.put("vicinity", vicinity);

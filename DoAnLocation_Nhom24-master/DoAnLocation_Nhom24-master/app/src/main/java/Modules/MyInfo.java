@@ -22,11 +22,11 @@ import com.google.android.gms.tasks.Task;
 
 class MyInfo implements GoogleMap.InfoWindowAdapter {
     private Activity context;
-    Bitmap btm;
+    private Bitmap btm;
 
     public MyInfo(Activity context, Bitmap result)
     {
-       this.context=context;
+        this.context=context;
         this.btm=result;
     }
     @Override
