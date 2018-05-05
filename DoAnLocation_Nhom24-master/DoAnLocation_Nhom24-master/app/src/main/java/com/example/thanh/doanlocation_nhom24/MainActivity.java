@@ -23,6 +23,7 @@ import android.view.View;
 import android.view.Window;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.SeekBar;
 import android.widget.TextView;
@@ -55,6 +56,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import Modules.BaseActivity;
+import Modules.CustomInfoWindowAdapter;
 import Modules.DirectionFinder;
 import Modules.DirectionFinderListener;
 import Modules.GooglePlacesReadTask;
@@ -466,11 +468,12 @@ public class MainActivity extends BaseActivity implements View.OnClickListener, 
             LatLng latLng = new LatLng(latitude, longitude);
             googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng, 13));
             googleMap.setMyLocationEnabled(true);
-           /* MarkerOptions option=new MarkerOptions();
+              MarkerOptions option=new MarkerOptions();
             option.position(latLng);
-            Marker currentMarker= map.addMarker(option);
-            ImageLoad imgTask=new ImageLoad(this,"https://maps.googleapis.com/maps/api/place/photo?maxwidth=500&photoreference=CmRaAAAA9dtMyeFaZqUGpLGsxrSIOkuK5pS2f0Wkhc1Sv-Qu7l3ffP8r8SA-vCty4sM3gxyVTNd8OltrvEGiojC2o_sRmjnKyf9gC4KjB99EZT1YeIH-olJzMJpaboN5WlVpd--2EhABYYHh22ssCfq9iEB3dMW4GhT2Z6rQwyzTu9uFgKl3HPAg4JFyZA&key=AIzaSyDviXBV3UhvjTvNkDrZvv5i9sg_9Ekxwuo",map,currentMarker);
-            imgTask.execute();*/
+            CustomInfoWindowAdapter adapter = new CustomInfoWindowAdapter(MainActivity.this);
+            map.setInfoWindowAdapter(adapter);
+            Marker m = map.addMarker(option);
+            m.showInfoWindow();
         }
     }
 

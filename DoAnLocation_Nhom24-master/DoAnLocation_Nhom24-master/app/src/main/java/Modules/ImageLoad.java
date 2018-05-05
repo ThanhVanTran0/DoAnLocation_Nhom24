@@ -58,17 +58,12 @@ public class ImageLoad extends AsyncTask<Void,Void,Bitmap> {
         }
         return null;
     }
-  //  private Bitmap getPhotos(String placeId) {
-
-
-    //}
-
 
 
     @Override
     protected void onPostExecute(Bitmap bitmap) {
         super.onPostExecute(bitmap);
-        map.setInfoWindowAdapter(new MyInfo(context,bitmap));
+     //   map.setInfoWindowAdapter(new MyInfo(context,bitmap));
       //  currentMarker.showInfoWindow();
     }
 }

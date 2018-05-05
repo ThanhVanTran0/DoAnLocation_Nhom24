@@ -26,11 +26,6 @@ public class CustomInfoWindowAdapter implements GoogleMap.InfoWindowAdapter {
         if(!name.equals("")){
             name.setText(title);
         }
-        String snippet = marker.getSnippet();
-       TextView address = (TextView)view.findViewById(R.id.address);
-        if(!address.equals("")){
-            address.setText(snippet);
-        }
     }
     @Override
     public View getInfoWindow(Marker marker) {

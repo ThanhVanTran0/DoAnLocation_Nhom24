@@ -50,6 +50,7 @@ public class Places {
         String longitude = "";
         String reference = "";
         String photo ="";
+        Double rating = 0.0;
         try {
             if (!googlePlaceJson.isNull("name")) {
                 placeName = googlePlaceJson.getString("name");
@@ -60,17 +61,22 @@ public class Places {
             latitude = googlePlaceJson.getJSONObject("geometry").getJSONObject("location").getString("lat");
             longitude = googlePlaceJson.getJSONObject("geometry").getJSONObject("location").getString("lng");
             reference = googlePlaceJson.getString("reference");
-            JSONArray photos = googlePlaceJson.getJSONArray("photos");
-            JSONObject pt = photos.getJSONObject(0);
-            photo="https://maps.googleapis.com/maps/api/place/photo?maxwidth=400&photoreference="+ pt.getString("photo_reference")
-                  +"&sensor=true&key=AIzaSyDviXBV3UhvjTvNkDrZvv5i9sg_9Ekxwuo";
-
+            if (!googlePlaceJson.isNull("photos")){
+                JSONArray photos = googlePlaceJson.getJSONArray("photos");
+                JSONObject pt = photos.getJSONObject(0);
+                photo="https://maps.googleapis.com/maps/api/place/photo?maxwidth=500&photoreference="+ pt.getString("photo_reference")
+                        +"&sensor=true&key=AIzaSyDviXBV3UhvjTvNkDrZvv5i9sg_9Ekxwuo";
+            }
+            if (!googlePlaceJson.isNull("rating")) {
+                 rating= googlePlaceJson.getDouble("rating");
+            }
             googlePlaceMap.put("place_name", placeName);
             googlePlaceMap.put("vicinity", vicinity);
             googlePlaceMap.put("lat", latitude);
             googlePlaceMap.put("lng", longitude);
             googlePlaceMap.put("reference", reference);
-           googlePlaceMap.put("photo",photo);
+            googlePlaceMap.put("photo",photo);
+            googlePlaceMap.put("rating",Double.toString(rating));
         } catch (JSONException e) {
             e.printStackTrace();
         }

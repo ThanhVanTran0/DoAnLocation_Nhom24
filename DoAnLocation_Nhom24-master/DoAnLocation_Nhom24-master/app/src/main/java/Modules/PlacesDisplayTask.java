@@ -55,10 +55,10 @@ public class PlacesDisplayTask extends AsyncTask<Object, Integer, List<HashMap<S
                 String placeName = googlePlace.get("place_name");
                 String vicinity = googlePlace.get("vicinity");
                 String photo=googlePlace.get("photo");
+                String rating = googlePlace.get("rating");
                 LatLng latLng = new LatLng(lat, lng);
                 markerOptions.position(latLng);
-                markerOptions.title(placeName);
-                markerOptions.snippet(vicinity);
+                markerOptions.title(placeName+"\n"+vicinity+"\nRating: "+rating);
                 Marker marker = googleMap.addMarker(markerOptions);
                 marker.showInfoWindow();
                 imgTask = new ImageLoad(Context, photo, googleMap, marker);

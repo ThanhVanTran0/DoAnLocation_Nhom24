@@ -30,19 +30,17 @@ class MyInfo implements GoogleMap.InfoWindowAdapter {
         this.btm=result;
     }
     @Override
-    public View getInfoContents(Marker arg0) {
-        View v = this.context.getLayoutInflater().inflate(R.layout.custom_maker, null);
-        LatLng latLng = arg0.getPosition();
+    public View getInfoContents(Marker marker) {
+        View v =  context.getLayoutInflater().inflate(R.layout.custom_maker, null);
+        LatLng latLng = marker.getPosition();
         TextView name = (TextView) v.findViewById(R.id.name);
-        TextView address = (TextView) v.findViewById(R.id.address);
         ImageView img=(ImageView) v.findViewById(R.id.img);
-        name.setText(arg0.getTitle());
-       address.setText(arg0.getSnippet());
+        name.setText(marker.getTitle());
         img.setImageBitmap(btm);
         return v;
     }
     @Override
-    public View getInfoWindow(Marker arg0) {
+    public View getInfoWindow(Marker marker) {
 
         return null;
     }
