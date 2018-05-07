@@ -416,6 +416,12 @@ public class MainActivity extends BaseActivity implements View.OnClickListener, 
                 ShowDialogChonBanKinh();
             }
             break;
+            case R.id.navHDSD:
+            {
+                Intent intent = new Intent(MainActivity.this,HDSDActivity.class);
+                startActivity(intent);
+            }
+            break;
         }
         this.drawerLayout.closeDrawer(GravityCompat.START);
         return false;
@@ -498,7 +504,9 @@ public class MainActivity extends BaseActivity implements View.OnClickListener, 
         googleMap.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
             @Override
             public boolean onMarkerClick(Marker marker) {
-                diaDiemCanThem = (DiaDiem) marker.getTag();
+                if(marker !=null) {
+                    diaDiemCanThem = (DiaDiem) marker.getTag();
+                }
                 return false;
             }
         });

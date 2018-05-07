@@ -31,18 +31,15 @@
             android:icon="@drawable/ic_location"
             />
 
-        <item android:id="@+id/navIdea"
-            android:title="@string/y_tuong"
-            android:icon="@drawable/ic_idea"
+        <item android:id="@+id/navHDSD"
+            android:title="@string/hdsd"
+            android:icon="@drawable/ic_library_books_black_24dp"
             />
     </group>
 
     <group android:checkableBehavior="none"
         android:id="@+id/group2"
         >
-            <item android:id="@+id/navDanhgia"
-                android:title="@string/danh_gia"/>
-
             <item android:id="@+id/navPhanhoi"
                 android:title="@string/phan_hoi"/>
 

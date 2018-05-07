@@ -35,11 +35,13 @@ public class MyInfo implements GoogleMap.InfoWindowAdapter {
         ImageView img=(ImageView) v.findViewById(R.id.img);
         name.setText(marker.getTitle());
         diaDiem = (DiaDiem) marker.getTag();
-        if(diaDiem.getImgDiaDiem() != null) {
-            img.setImageBitmap(diaDiem.getImgDiaDiem());
-        }
-        else {
-            img.setImageResource(R.drawable.img_noimage);
+        if(diaDiem!=null) {
+            if(diaDiem.getImgDiaDiem() != null) {
+                img.setImageBitmap(diaDiem.getImgDiaDiem());
+            }
+            else {
+                img.setImageResource(R.drawable.img_noimage);
+            }
         }
     }
 
