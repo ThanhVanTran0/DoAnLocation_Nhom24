@@ -1,14 +1,18 @@
 package Adapter;
 
 import android.content.Context;
+import android.graphics.Bitmap;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
+import android.widget.CheckBox;
+import android.widget.CompoundButton;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import Models.DiaDiem;
 
@@ -45,7 +49,7 @@ public class CustomAdapter extends ArrayAdapter<DiaDiem> {
             viewHolder = new ViewHolder();
             //Anh xa;
             viewHolder.imgDiaDiem = convertView.findViewById(R.id.imgDiaDiemUaThich);
-            viewHolder.imgLoaiCuaHang = convertView.findViewById(R.id.imgLoaiCuaHang);
+            viewHolder.cbXoa = convertView.findViewById(R.id.cbXoa);
             viewHolder.txtTenCuaHang = convertView.findViewById(R.id.txtTenCuaHang);
             viewHolder.txtViTri = convertView.findViewById(R.id.txtViTri);
             convertView.setTag(viewHolder);
@@ -54,11 +58,17 @@ public class CustomAdapter extends ArrayAdapter<DiaDiem> {
             viewHolder = (ViewHolder) convertView.getTag();
         }
 
-//        DiaDiem diaDiemUaThich = objects.get(position);
-//        viewHolder.imgDiaDiem.setImageResource(diaDiemUaThich.getImage());
-//        viewHolder.imgLoaiCuaHang.setImageResource(diaDiemUaThich.getImgLoaiDiaDiem());
-//        viewHolder.txtTenCuaHang.setText(diaDiemUaThich.getTenCuaHang());
-//        viewHolder.txtViTri.setText(diaDiemUaThich.getViTri());
+        DiaDiem diaDiem = objects.get(position);
+        Bitmap b = diaDiem.getImgDiaDiem();
+        if(b == null)
+        {
+            viewHolder.imgDiaDiem.setImageResource(R.drawable.img_noimage);
+        }
+        else {
+            viewHolder.imgDiaDiem.setImageBitmap(b);
+        }
+        viewHolder.txtTenCuaHang.setText(diaDiem.getTenDiaDiem());
+        viewHolder.txtViTri.setText(diaDiem.getDiaChi());
         return convertView;
     }
 
@@ -66,6 +76,6 @@ public class CustomAdapter extends ArrayAdapter<DiaDiem> {
         ImageView imgDiaDiem;
         TextView txtTenCuaHang;
         TextView txtViTri;
-        ImageView imgLoaiCuaHang;
+        CheckBox cbXoa;
     }
 }

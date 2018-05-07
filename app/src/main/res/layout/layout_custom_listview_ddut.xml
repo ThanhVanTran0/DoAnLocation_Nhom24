@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="wrap_content">
 
     <ImageView
         android:id="@+id/imgDiaDiemUaThich"
@@ -20,6 +20,7 @@
         android:textSize="18sp"
         android:layout_toRightOf="@id/imgDiaDiemUaThich"
         android:layout_marginTop="10dp"
+        android:maxLines="1"
         />
 
     <TextView
@@ -29,18 +30,24 @@
         android:layout_below="@+id/txtTenCuaHang"
         android:layout_toEndOf="@+id/imgDiaDiemUaThich"
         android:layout_toRightOf="@+id/imgDiaDiemUaThich"
-        android:text="Đường Nguyễn Thị Minh Khai, TP HCM" />
+        android:text="Đường Nguyễn Thị Minh Khai, TP HCM"
+        android:maxLines="3"
+        />
 
-    <ImageView
-        android:layout_width="40dp"
-        android:layout_height="40dp"
-        android:id="@+id/imgLoaiCuaHang"
+    <CheckBox
+        android:id="@+id/cbXoa"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignBaseline="@+id/txtViTri"
         android:layout_alignBottom="@+id/txtViTri"
         android:layout_alignParentEnd="true"
         android:layout_alignParentRight="true"
-        android:layout_marginEnd="17dp"
-        android:layout_marginRight="17dp"
-        android:src="@drawable/ic_local_cafe_black_24dp" />
+        android:layout_marginEnd="22dp"
+        android:layout_marginRight="22dp"
+        android:focusable="false"
+        android:focusableInTouchMode="false"
+        android:checked="false"
+        />
 
     <TextView
         android:layout_width="match_parent"

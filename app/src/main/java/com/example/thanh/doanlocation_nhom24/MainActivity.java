@@ -1,16 +1,19 @@
 package com.example.thanh.doanlocation_nhom24;
 
 import android.Manifest;
+import android.app.Activity;
 import android.app.Dialog;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.location.Criteria;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.Bundle;
+import android.os.Parcelable;
 import android.support.annotation.NonNull;
 import android.support.design.widget.NavigationView;
 import android.support.v4.app.ActivityCompat;
@@ -59,6 +62,8 @@ import com.google.android.gms.maps.model.PolylineOptions;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 
+import java.io.ByteArrayOutputStream;
+import java.io.Serializable;
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.List;
@@ -78,7 +83,7 @@ public class MainActivity extends BaseActivity implements View.OnClickListener, 
     private NavigationView navigationView;
     private FloatingActionMenu floatingActionMenu;
     private com.github.clans.fab.FloatingActionButton fBtnTimDuong, fBtnThemDiaDiem, fBtnMyLoacation;
-    private Dialog dialog, dialog_chonBanKinh,dialog_timDuong,dialog_chonLoaiDiaDiem;
+    private Dialog dialog, dialog_chonBanKinh,dialog_timDuong;
     private GoogleApiClient googleApiClient;
     private GoogleMap googleMap;
     private double latitude = 0;
@@ -93,14 +98,16 @@ public class MainActivity extends BaseActivity implements View.OnClickListener, 
     private final int PLACE_AUTOCOMPLETE_REQUEST_CODE = 1;
     private final int PLACE_AUTOCOMPLETE_DIA_DIEMXUAT_PHAT = 2;
     private final int PLACE_AUTOCOMPLETE_DIA_DIEM_DEN = 3;
+    private final  int DIA_DIEM_DEN = 1;
+    private final int DIA_DIEM_XUAT_PHAT = 2;
+    private final int REQUEST_CODE_FROM_DIA_DIEM_CUA_BAN = 4;
 
     private LatLng DiaDiemXuatPhat = null;
     private LatLng DiaDiemDen = null;
     private Marker marker = null;
 
     private int DIA_DIEM_DUOC_CHON = 0;
-    private final  int DIA_DIEM_DEN = 1;
-    private final int DIA_DIEM_XUAT_PHAT = 2;
+
 
     private List<Marker> originMarkers = new ArrayList<>();
     private List<Marker> destinationMarkers = new ArrayList<>();
@@ -196,7 +203,12 @@ public class MainActivity extends BaseActivity implements View.OnClickListener, 
                 }
                 else {
                     floatingActionMenu.close(true);
-                    ShowDialogChonLoaiDiaDiem();
+//                todo dia diem ua thich
+                    Intent intent = new Intent(MainActivity.this,DiaDiemCuaBanActivity.class);
+                    intent.putExtras(diaDiemCanThem.toBundle());
+                    intent.putExtra("FROM",1);
+                    startActivityForResult(intent,REQUEST_CODE_FROM_DIA_DIEM_CUA_BAN);
+                    diaDiemCanThem = null;
                 }
             }
             break;
@@ -295,37 +307,8 @@ public class MainActivity extends BaseActivity implements View.OnClickListener, 
                 MoPlaceAutocomplete(PLACE_AUTOCOMPLETE_DIA_DIEMXUAT_PHAT);
             }
             break;
-            case R.id.dialog_lua_chon_btnThoat:
-            {
-                dialog_chonLoaiDiaDiem.dismiss();
-            }
-            break;
-            case R.id.dialog_dudinhtoi:
-            {
-
-            }
-            break;
-            case R.id.dialog_yeuThich:
-            {
-
-            }
-            break;
         }
 
-    }
-
-    private void ShowDialogChonLoaiDiaDiem() {
-        dialog_chonLoaiDiaDiem = new Dialog(this);
-        dialog_chonLoaiDiaDiem.requestWindowFeature(Window.FEATURE_NO_TITLE);
-        dialog_chonLoaiDiaDiem.setContentView(R.layout.custom_dialog_dia_diem_cua_ban);
-        dialog_chonLoaiDiaDiem.setCanceledOnTouchOutside(false);
-        Button btnThoat = dialog_chonLoaiDiaDiem.findViewById(R.id.dialog_lua_chon_btnThoat);
-        LinearLayout dialog_yeuThich = dialog_chonLoaiDiaDiem.findViewById(R.id.dialog_yeuThich);
-        LinearLayout dialog_dudinhtoi = dialog_chonLoaiDiaDiem.findViewById(R.id.dialog_dudinhtoi);
-        btnThoat.setOnClickListener(this);
-        dialog_yeuThich.setOnClickListener(this);
-        dialog_dudinhtoi.setOnClickListener(this);
-        dialog_chonLoaiDiaDiem.show();
     }
 
     private void HienLaiDialogSauKhiChonDiaDiem() {
@@ -417,7 +400,8 @@ public class MainActivity extends BaseActivity implements View.OnClickListener, 
             break;
             case R.id.navLocation: {
                 Intent intent = new Intent(MainActivity.this, DiaDiemCuaBanActivity.class);
-                startActivity(intent);
+                intent.putExtra("FROM",-1);
+                startActivityForResult(intent,REQUEST_CODE_FROM_DIA_DIEM_CUA_BAN);
             }
             break;
             case R.id.navTimNhaHang: {
@@ -673,6 +657,32 @@ public class MainActivity extends BaseActivity implements View.OnClickListener, 
 
             } else if (resultCode == RESULT_CANCELED) {
                 // The user canceled the operation.
+            }
+        }
+        if(requestCode == REQUEST_CODE_FROM_DIA_DIEM_CUA_BAN) {
+            if(resultCode == Activity.RESULT_OK) {
+                Bundle bundle = data.getExtras();
+                if(bundle!=null) {
+                    double lat = bundle.getDouble("LAT");
+                    double lon = bundle.getDouble("LON");
+                    String Ten = bundle.getString("TEN");
+                    String DiaChi = bundle.getString("DIACHI");
+                    byte[] arr = bundle.getByteArray("BITMAP");
+                    Bitmap bitmap = null;
+                    if(arr !=null) {
+                        bitmap = BitmapFactory.decodeByteArray(arr,0,arr.length);
+                    }
+                    DiaDiem diaDiem = new DiaDiem(bitmap,new LatLng(lat,lon),DiaChi,Ten);
+                    googleMap.clear();
+                    LatLng latLng = diaDiem.getLatLng();
+                    MarkerOptions markerOptions = new MarkerOptions();
+                    markerOptions.position(latLng);
+                    markerOptions.title(diaDiem.getTenDiaDiem() + "\n"+ diaDiem.getDiaChi());
+                    myMarker = googleMap.addMarker(markerOptions);
+                    myMarker.setTag(diaDiem);
+                    googleMap.setInfoWindowAdapter(new MyInfo(this));
+                    googleMap.animateCamera(CameraUpdateFactory.newLatLngZoom(latLng, 13), 1500, null);
+                }
             }
         }
 

@@ -1,16 +1,21 @@
 package Models;
 
 import android.graphics.Bitmap;
+import android.os.Bundle;
 import android.util.Log;
 
 import com.google.android.gms.maps.model.LatLng;
+
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.Serializable;
 
 
 /**
  * Created by Thanh on 4/30/2018.
  */
 
-public class DiaDiem {
+public class DiaDiem implements Serializable{
     private Bitmap imgDiaDiem;
     private LatLng latLng;
     private String diaChi;
@@ -54,5 +59,23 @@ public class DiaDiem {
 
     public void setDiaChi(String diaChi) {
         this.diaChi = diaChi;
+    }
+
+    public Bundle toBundle() {
+        Bundle b= new Bundle();
+        b.putString("DIACHI",this.diaChi);
+        b.putString("TEN",this.tenDiaDiem);
+        b.putDouble("LAT",this.latLng.latitude);
+        b.putDouble("LON",this.latLng.longitude);
+        if (imgDiaDiem == null) {
+            b.putByteArray("BITMAP",null);
+        }
+        else {
+            ByteArrayOutputStream stream = new ByteArrayOutputStream();
+            imgDiaDiem.compress(Bitmap.CompressFormat.PNG,100,stream);
+            byte[] bitmap = stream.toByteArray();
+            b.putByteArray("BITMAP",bitmap);
+        }
+        return b;
     }
 }
