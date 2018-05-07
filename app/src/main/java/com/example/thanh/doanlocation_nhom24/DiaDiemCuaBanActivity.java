@@ -6,8 +6,6 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.support.design.widget.TabLayout;
-import android.support.v4.view.ViewPager;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -15,7 +13,6 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.CheckBox;
 import android.widget.ListView;
-import android.widget.Toast;
 
 import com.google.android.gms.maps.model.LatLng;
 
@@ -24,11 +21,14 @@ import java.util.ArrayList;
 import Adapter.CustomAdapter;
 import Models.DiaDiem;
 import Modules.BaseActivity;
+import Modules.XuLyFile;
 
 public class DiaDiemCuaBanActivity extends BaseActivity {
-    private ArrayList<DiaDiem> diaDiems;
+    private ArrayList<DiaDiem> diaDiems = null;
     private ListView listView;
     private CustomAdapter adapter;
+    private XuLyFile xuLyFile;
+    private boolean CheckSuThayDoi = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -37,10 +37,15 @@ public class DiaDiemCuaBanActivity extends BaseActivity {
 
         inItToolBar("Địa điểm của bạn");
 
+        xuLyFile = new XuLyFile(this);
+//        xuLyFile.LuuDanhSachDiaDiem(null);
+        diaDiems = xuLyFile.DocDanhSachDiaDiem();
+        if(diaDiems == null) {
+            diaDiems = new ArrayList<>();
+        }
+
         AnhXa();
         AddSuKien();
-        // TODO: 5/6/2018 Doc tu file len
-        diaDiems = new ArrayList<>();
 
         Intent intent = getIntent();
         int from = intent.getIntExtra("FROM",-1);
@@ -58,11 +63,9 @@ public class DiaDiemCuaBanActivity extends BaseActivity {
                 }
                 DiaDiem diaDiem = new DiaDiem(bitmap,new LatLng(lat,lon),DiaChi,Ten);
                 diaDiems.add(diaDiem);
+                CheckSuThayDoi = true;
             }
         }
-        diaDiems.add(new DiaDiem(null,new LatLng(0,0),"HCM1","HCM"));
-        diaDiems.add(new DiaDiem(null,new LatLng(0,0),"HCM2","HCM"));
-        diaDiems.add(new DiaDiem(null,new LatLng(0,0),"HCM3","HCM"));
         adapter = new CustomAdapter(this,R.layout.layout_custom_listview_ddut,diaDiems);
         listView.setAdapter(adapter);
         adapter.notifyDataSetChanged();
@@ -97,7 +100,6 @@ public class DiaDiemCuaBanActivity extends BaseActivity {
         builder.setNegativeButton("Có", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialogInterface, int i) {
-                // TODO: 5/7/2018 Truyen du lieu va gui ve
                 Intent data = new Intent();
                 data.putExtras(diaDiem.toBundle());
                 setResult(Activity.RESULT_OK,data);
@@ -134,6 +136,7 @@ public class DiaDiemCuaBanActivity extends BaseActivity {
                 checkBox = v.findViewById(R.id.cbXoa);
                 if(checkBox.isChecked()) {
                     checkBox.setChecked(false);
+                    CheckSuThayDoi = true;
                     diaDiems.remove(i);
                 }
             }
@@ -148,4 +151,10 @@ public class DiaDiemCuaBanActivity extends BaseActivity {
         setResult(Activity.RESULT_CANCELED);
     }
 
+    @Override
+    protected void onPause() {
+        super.onPause();
+        if(CheckSuThayDoi)
+            xuLyFile.LuuDanhSachDiaDiem(diaDiems);
+    }
 }

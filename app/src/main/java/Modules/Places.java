@@ -62,7 +62,7 @@
                     if (!googlePlaceJson.isNull("photos")){
                         JSONArray photos = googlePlaceJson.getJSONArray("photos");
                         JSONObject pt = photos.getJSONObject(0);
-                        photo="https://maps.googleapis.com/maps/api/place/photo?maxwidth=500&photoreference="+ pt.getString("photo_reference")
+                        photo="https://maps.googleapis.com/maps/api/place/photo?maxwidth=100&photoreference="+ pt.getString("photo_reference")
                                 +"&sensor=true&key=AIzaSyD73ix-2OxsdM03JnoTj5gbxwbPRAJZSiM";
                     }
                     if (!googlePlaceJson.isNull("rating")) {
