@@ -2,22 +2,22 @@ package Modules;
 
 import android.util.Log;
 
+import org.json.JSONArray;
+import org.json.JSONObject;
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.util.Random;
 
 /**
  * Created by nguyenthang on 4/19/18.
  */
 
 public class http {
-
-    public http() {
-
-    }
 
     public String read(String httpUrl) throws IOException {
         String httpData = "";
@@ -35,15 +35,28 @@ public class http {
                 stringBuffer.append(line);
             }
             httpData = stringBuffer.toString();
+
+            JSONObject object = new JSONObject(httpData);
+            String places = object.get("results").toString();
+            JSONArray array = new JSONArray(places);
+            JSONArray array1 = new JSONArray();
+            Random random = new Random();
+            for(int i=0;i<40;i++){
+                int j = random.nextInt(array.length());
+                array1.put(array.get(j));
+
+            }
+            object.put("results", array1);
+            httpData = object.toString();
             bufferedReader.close();
         } catch (Exception e) {
             e.printStackTrace();
         } finally {
             inputStream.close();
-
             httpURLConnection.disconnect();
         }
         Log.e("httpData", httpData);
         return httpData;
+
     }
 }
