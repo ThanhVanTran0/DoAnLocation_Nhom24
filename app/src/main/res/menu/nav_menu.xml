@@ -17,6 +17,11 @@
             android:icon="@drawable/ic_local_cafe_black_24dp"
             />
 
+        <item android:id="@+id/navXoaDiaDiem"
+            android:title="Xóa tất cả địa điểm"
+            android:icon="@drawable/ic_delete_forever_black_24dp"
+            />
+
         <item android:id="@+id/navThayDoiBanKinh"
             android:title="@string/dc_ban_kinh_tim_kiem"
             android:icon="@drawable/ic_pham_vi_tim_kiem_24dp"

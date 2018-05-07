@@ -36,18 +36,6 @@ public class http {
             }
             httpData = stringBuffer.toString();
 
-            JSONObject object = new JSONObject(httpData);
-            String places = object.get("results").toString();
-            JSONArray array = new JSONArray(places);
-            JSONArray array1 = new JSONArray();
-            Random random = new Random();
-            for(int i=0;i<40;i++){
-                int j = random.nextInt(array.length());
-                array1.put(array.get(j));
-
-            }
-            object.put("results", array1);
-            httpData = object.toString();
             bufferedReader.close();
         } catch (Exception e) {
             e.printStackTrace();

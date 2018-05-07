@@ -13,7 +13,6 @@ import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.Bundle;
-import android.os.Parcelable;
 import android.support.annotation.NonNull;
 import android.support.design.widget.NavigationView;
 import android.support.v4.app.ActivityCompat;
@@ -62,8 +61,6 @@ import com.google.android.gms.maps.model.PolylineOptions;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 
-import java.io.ByteArrayOutputStream;
-import java.io.Serializable;
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.List;
@@ -422,6 +419,11 @@ public class MainActivity extends BaseActivity implements View.OnClickListener, 
                 startActivity(intent);
             }
             break;
+            case R.id.navXoaDiaDiem:
+            {
+                googleMap.clear();
+            }
+            break;
         }
         this.drawerLayout.closeDrawer(GravityCompat.START);
         return false;
@@ -602,7 +604,8 @@ public class MainActivity extends BaseActivity implements View.OnClickListener, 
         googlePlacesUrl.append("&radius=" + PROXIMITY_RADIUS);
         googlePlacesUrl.append("&types=" + type);
         googlePlacesUrl.append("&sensor=true");
-        googlePlacesUrl.append("&key=" + "AIzaSyDviXBV3UhvjTvNkDrZvv5i9sg_9Ekxwuo");
+        googlePlacesUrl.append("&opennow=true");
+        googlePlacesUrl.append("&key=" + "AIzaSyD73ix-2OxsdM03JnoTj5gbxwbPRAJZSiM");
         //Mượn tạm api của thắng
         Log.e("URL", googlePlacesUrl.toString());
         GooglePlacesReadTask googlePlacesReadTask = new GooglePlacesReadTask(this);
