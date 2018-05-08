@@ -422,6 +422,11 @@ public class MainActivity extends BaseActivity implements View.OnClickListener, 
                 startActivity(intent);
             }
             break;
+            case R.id.navXoa:
+            {
+                googleMap.clear();
+            }
+            break;
         }
         this.drawerLayout.closeDrawer(GravityCompat.START);
         return false;
@@ -484,6 +489,7 @@ public class MainActivity extends BaseActivity implements View.OnClickListener, 
             return;
         }
         googleMap.setMyLocationEnabled(true);
+
         googleMap.getUiSettings().setZoomControlsEnabled(false);
         googleMap.getUiSettings().setMyLocationButtonEnabled(false);
         googleMap.getUiSettings().setMapToolbarEnabled(false);
@@ -587,7 +593,7 @@ public class MainActivity extends BaseActivity implements View.OnClickListener, 
                 Location location = locationManager.getLastKnownLocation(bestProvider);
                 if (location != null)
                     return location;
-                locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER,0,0,this);
+                locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER,5000,5,this);
             }
         }
         return null;
