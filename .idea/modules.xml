@@ -2,7 +2,8 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/DoAnLoacation_Nhom24.iml" filepath="$PROJECT_DIR$/DoAnLoacation_Nhom24.iml" />
+      <module fileurl="file://F:\HK6\PTUDDiDong\Code\DoAnLocation_Nhom24\DoAnLoacation_Nhom24.iml" filepath="F:\HK6\PTUDDiDong\Code\DoAnLocation_Nhom24\DoAnLoacation_Nhom24.iml" />
+      <module fileurl="file://$PROJECT_DIR$/DoAnLocation_Nhom24.iml" filepath="$PROJECT_DIR$/DoAnLocation_Nhom24.iml" />
       <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
     </modules>
   </component>

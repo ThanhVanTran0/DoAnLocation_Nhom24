@@ -19,11 +19,6 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.AppCompat.Light.NoActionBar">
         <activity android:name=".MainActivity">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
         </activity>
 
         <meta-data
@@ -36,7 +31,14 @@
         <activity android:name=".PhanHoiActivity" />
         <activity android:name=".DiaDiemCuaBanActivity" />
         <activity android:name=".HDSDActivity" />
-        <activity android:name=".SliderActivity"></activity>
+        <activity android:name=".SliderActivity" />
+        <activity android:name=".LoadActivity">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
     </application>
 
 </manifest>
