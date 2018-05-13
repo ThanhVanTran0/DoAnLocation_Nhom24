@@ -8,11 +8,12 @@ import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
-import android.location.Criteria;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
+import android.os.Build;
 import android.os.Bundle;
+import android.provider.Settings;
 import android.support.annotation.NonNull;
 import android.support.design.widget.NavigationView;
 import android.support.v4.app.ActivityCompat;
@@ -37,7 +38,6 @@ import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GooglePlayServicesNotAvailableException;
 import com.google.android.gms.common.GooglePlayServicesRepairableException;
 import com.google.android.gms.common.GooglePlayServicesUtil;
-import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.common.api.Status;
 import com.google.android.gms.location.places.AutocompleteFilter;
 import com.google.android.gms.location.places.GeoDataClient;
@@ -101,6 +101,7 @@ public class MainActivity extends BaseActivity implements View.OnClickListener, 
     private LatLng DiaDiemXuatPhat = null;
     private LatLng DiaDiemDen = null;
     private Marker marker = null;
+    private LatLng DiaDiemCuaToi = null;
 
     private int DIA_DIEM_DUOC_CHON = 0;
 
@@ -134,6 +135,8 @@ public class MainActivity extends BaseActivity implements View.OnClickListener, 
 
         // Construct a GeoDataClient.
         mGeoDataClient = Places.getGeoDataClient(this, null);
+
+        locationManager = (LocationManager) getSystemService(LOCATION_SERVICE);
     }
 
     private void ThemSuKien() {
@@ -199,7 +202,6 @@ public class MainActivity extends BaseActivity implements View.OnClickListener, 
                 }
                 else {
                     floatingActionMenu.close(true);
-//                todo dia diem ua thich
                     Intent intent = new Intent(MainActivity.this,DiaDiemCuaBanActivity.class);
                     intent.putExtras(diaDiemCanThem.toBundle());
                     intent.putExtra("FROM",1);
@@ -213,26 +215,9 @@ public class MainActivity extends BaseActivity implements View.OnClickListener, 
             }
             break;
             case R.id.fBtnMyLocation: {
-                Location location = getLocation();
-                if (location == null) {
-                    Toast.makeText(this, "Đang tìm địa điểm", Toast.LENGTH_SHORT).show();
-                } else {
-                    double latitude = location.getLatitude();
-                    double longitude = location.getLongitude();
-                    LatLng latLng = new LatLng(latitude, longitude);
-                    if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-                        // TODO: Consider calling
-                        //    ActivityCompat#requestPermissions
-                        // here to request the missing permissions, and then overriding
-                        //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
-                        //                                          int[] grantResults)
-                        // to handle the case where the user grants the permission. See the documentation
-                        // for ActivityCompat#requestPermissions for more details.
-                        return;
-                    }
-                    googleMap.animateCamera(CameraUpdateFactory.newLatLngZoom(latLng, 13), 1500, null);
-                    googleMap.setMyLocationEnabled(true);
-                }
+                RequestUpdateLocation();
+                googleMap.animateCamera(CameraUpdateFactory.newLatLngZoom(DiaDiemCuaToi,14),1000,null);
+                googleMap.setMyLocationEnabled(true);
             }
             break;
             case R.id.fBtnChonDiaDiemXuatPhat:
@@ -474,18 +459,7 @@ public class MainActivity extends BaseActivity implements View.OnClickListener, 
     @Override
     public void onMapReady(GoogleMap map) {
         this.googleMap = map;
-        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-            // TODO: Consider calling
-            //    ActivityCompat#requestPermissions
-            // here to request the missing permissions, and then overriding
-            //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
-            //                                          int[] grantResults)
-            // to handle the case where the user grants the permission. See the documentation
-            // for ActivityCompat#requestPermissions for more details.
-            return;
-        }
-        googleMap.setMyLocationEnabled(true);
-
+        Intent intent = getIntent();
         googleMap.getUiSettings().setZoomControlsEnabled(false);
         googleMap.getUiSettings().setMyLocationButtonEnabled(false);
         googleMap.getUiSettings().setMapToolbarEnabled(false);
@@ -512,42 +486,18 @@ public class MainActivity extends BaseActivity implements View.OnClickListener, 
                 return false;
             }
         });
-
-        googleMap.setOnMapClickListener(new GoogleMap.OnMapClickListener() {
-            @Override
-            public void onMapClick(LatLng latLng) {
-                diaDiemCanThem = null;
-            }
-        });
-        Location location = getLocation();
-        if (location == null) {
-            Toast.makeText(this, "Không tìm được vị trí của bạn", Toast.LENGTH_SHORT).show();
-        } else {
-            double latitude = location.getLatitude();
-            double longitude = location.getLongitude();
-            LatLng latLng = new LatLng(latitude, longitude);
-            googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng, 13));
-            googleMap.setMyLocationEnabled(true);
-        }
+        double lat = intent.getDoubleExtra("LAT",0);
+        double lon = intent.getDoubleExtra("LON",0);
+        DiaDiemCuaToi = new LatLng(lat,lon);
+        googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(DiaDiemCuaToi, 13));
+        googleMap.setMyLocationEnabled(true);
     }
 
     @Override
     public void onLocationChanged(Location location) {
         double latitude = location.getLatitude();
         double longitude = location.getLongitude();
-        LatLng latLng = new LatLng(latitude, longitude);
-        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-            // TODO: Consider calling
-            //    ActivityCompat#requestPermissions
-            // here to request the missing permissions, and then overriding
-            //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
-            //                                          int[] grantResults)
-            // to handle the case where the user grants the permission. See the documentation
-            // for ActivityCompat#requestPermissions for more details.
-            return;
-        }
-        googleMap.setMyLocationEnabled(true);
-        googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng, 13));
+        DiaDiemCuaToi = new LatLng(latitude,longitude);
     }
 
     @Override
@@ -562,7 +512,8 @@ public class MainActivity extends BaseActivity implements View.OnClickListener, 
 
     @Override
     public void onProviderDisabled(String s) {
-
+        Intent intent = new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS);
+        startActivity(intent);
     }
 
     public boolean isGooglePlayServiceAvailable() {
@@ -575,24 +526,19 @@ public class MainActivity extends BaseActivity implements View.OnClickListener, 
         }
     }
 
-    private Location getLocation() {
+    private void RequestLocation() {
         if (googleMap != null) {
-            locationManager = (LocationManager) getSystemService(LOCATION_SERVICE);
-            Criteria criteria = new Criteria();
-            String bestProvider = locationManager.getBestProvider(criteria, true);
-
             if (ActivityCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-
-                ActivityCompat.requestPermissions(this, new String[]{android.Manifest.permission.ACCESS_COARSE_LOCATION},
-                        200);
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                    requestPermissions(new String[]{
+                            Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION,
+                            Manifest.permission.INTERNET
+                    }, 10);
+                }
             } else {
-                Location location = locationManager.getLastKnownLocation(bestProvider);
-                if (location != null)
-                    return location;
-                locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER,5000,5,this);
+                RequestUpdateLocation();
             }
         }
-        return null;
     }
 
     private void TaoMarkerDiaDiem(String query){
@@ -775,5 +721,20 @@ public class MainActivity extends BaseActivity implements View.OnClickListener, 
                 });
             }
         });
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        switch (requestCode) {
+            case 10: {
+                if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED)
+                    locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER,5000,5,this);
+                return;
+            }
+        }
+    }
+
+    private void RequestUpdateLocation(){
+        locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER,5000,5,this);
     }
 }

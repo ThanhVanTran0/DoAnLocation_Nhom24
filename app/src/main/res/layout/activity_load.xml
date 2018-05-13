@@ -9,10 +9,20 @@
     tools:context="com.example.thanh.doanlocation_nhom24.LoadActivity">
 
     <TextView
-        android:id="@+id/txtTest"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="sada"
+        android:textColor="#FFF"
+        android:text="Food &amp; Drink"
+        android:textSize="50sp"
+        android:gravity="center"
+        android:layout_marginTop="50dp"
+        />
+
+    <ImageView
+        android:layout_width="400px"
+        android:layout_height="400px"
+        android:layout_centerInParent="true"
+        android:src="@drawable/img_load_activity"
         />
 
     <LinearLayout

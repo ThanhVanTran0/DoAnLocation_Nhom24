@@ -33,6 +33,8 @@ public class LoadActivity extends AppCompatActivity {
             public void onLocationChanged(Location location) {
                 locationManager.removeUpdates(locationListener);
                 Intent intent = new Intent(LoadActivity.this,MainActivity.class);
+                intent.putExtra("LAT",location.getLatitude());
+                intent.putExtra("LON",location.getLongitude());
                 startActivity(intent);
                 finish();
             }
