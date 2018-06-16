@@ -1,10 +1,14 @@
 
         package Modules;
 
+        import android.util.Log;
+        import android.widget.Toast;
+
         import org.json.JSONArray;
         import org.json.JSONException;
         import org.json.JSONObject;
 
+        import java.io.IOException;
         import java.util.ArrayList;
         import java.util.HashMap;
         import java.util.List;
@@ -18,10 +22,59 @@
                 JSONArray jsonArray = null;
                 try {
                     jsonArray = jsonObject.getJSONArray("results");
+                    String nextPage1;
+                    String nextPage2;
+                    JSONObject object1 = null;
+                    JSONObject object2 = null;
+
+                    String token1 = getTokenPage(jsonObject);
+
+                    if(token1!=null || token1 == "") {
+                        nextPage1 = getNextPage(token1);
+                        if(nextPage1 != null) {
+                            object1 = new JSONObject(nextPage1);
+                            JSONArray jsonArray1 = object1.getJSONArray("results");
+                            for(int i=0;i<jsonArray1.length();i++)
+                                jsonArray.put(jsonArray1.get(i));
+                            String token2 = getTokenPage(object1);
+                            if(token2 != null) {
+                                nextPage2 = getNextPage(token2);
+                                if(nextPage2 != null) {
+                                    object2 = new JSONObject(nextPage2);
+                                    JSONArray jsonArray2 = object2.getJSONArray("results");
+                                    for(int i=0;i<jsonArray2.length();i++)
+                                        jsonArray.put(jsonArray2.get(i));
+                                }
+                            }
+                        }
+                    }
+
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
                 return getPlaces(jsonArray);
+            }
+
+            private String getTokenPage(JSONObject jsonObject) {
+                String token = null;
+                try {
+                    token = jsonObject.getString("next_page_token");
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+                return token;
+            }
+
+            private String getNextPage(String token) {
+                http http = new http();
+                String result = null;
+                String url = "https://maps.googleapis.com/maps/api/place/nearbysearch/json?pagetoken=" + token +"&key=AIzaSyD73ix-2OxsdM03JnoTj5gbxwbPRAJZSiM";
+                try {
+                    result = http.read(url);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+                return result;
             }
 
             private List<HashMap<String, String>> getPlaces(JSONArray jsonArray) {

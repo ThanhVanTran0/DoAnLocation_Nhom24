@@ -491,6 +491,7 @@ public class MainActivity extends BaseActivity implements View.OnClickListener, 
         DiaDiemCuaToi = new LatLng(lat,lon);
         googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(DiaDiemCuaToi, 13));
         googleMap.setMyLocationEnabled(true);
+        RequestLocation();
     }
 
     @Override
@@ -552,7 +553,6 @@ public class MainActivity extends BaseActivity implements View.OnClickListener, 
         googlePlacesUrl.append("&sensor=true");
         googlePlacesUrl.append("&opennow=true");
         googlePlacesUrl.append("&key=" + "AIzaSyD73ix-2OxsdM03JnoTj5gbxwbPRAJZSiM");
-        //Mượn tạm api của thắng
         Log.e("URL", googlePlacesUrl.toString());
         GooglePlacesReadTask googlePlacesReadTask = new GooglePlacesReadTask(this);
         Object[] toPass = new Object[2];

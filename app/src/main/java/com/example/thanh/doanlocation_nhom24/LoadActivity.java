@@ -15,73 +15,49 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.ProgressBar;
 import android.widget.TextView;
+import android.widget.Toast;
+
+import com.google.android.gms.location.FusedLocationProviderClient;
+import com.google.android.gms.location.LocationServices;
+import com.google.android.gms.tasks.OnSuccessListener;
 
 public class LoadActivity extends AppCompatActivity {
 
     private LocationManager locationManager;
     private android.location.LocationListener locationListener;
-
+    private FusedLocationProviderClient client;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_load);
 
-        locationManager = (LocationManager) getSystemService(LOCATION_SERVICE);
-        locationListener = new android.location.LocationListener() {
-            @Override
-            public void onLocationChanged(Location location) {
-                locationManager.removeUpdates(locationListener);
-                Intent intent = new Intent(LoadActivity.this,MainActivity.class);
-                intent.putExtra("LAT",location.getLatitude());
-                intent.putExtra("LON",location.getLongitude());
-                startActivity(intent);
-                finish();
-            }
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            requestPermissions();
+        }
 
-            @Override
-            public void onStatusChanged(String s, int i, Bundle bundle) {
-
-            }
-
-            @Override
-            public void onProviderEnabled(String s) {
-
-            }
-
-            @Override
-            public void onProviderDisabled(String s) {
-                Intent intent = new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS);
-                startActivity(intent);
-            }
-        };
+        client = LocationServices.getFusedLocationProviderClient(this);
 
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                requestPermissions(new String[]{
-                        Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION,
-                        Manifest.permission.INTERNET
-                }, 10);
-            }
+
             return;
-        } else {
-            configureButton();
         }
-        locationManager.requestLocationUpdates("gps", 5000, 0, locationListener);
-    }
 
-    @Override
-    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
-        switch (requestCode) {
-            case 10: {
-                if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED)
-                    configureButton();
-                return;
+        client.getLastLocation().addOnSuccessListener(LoadActivity.this, new OnSuccessListener<Location>() {
+            @Override
+            public void onSuccess(Location location) {
+                if (location != null) {
+                    Intent intent = new Intent(LoadActivity.this,MainActivity.class);
+                    intent.putExtra("LAT",location.getLatitude());
+                    intent.putExtra("LON",location.getLongitude());
+                    startActivity(intent);
+                    finish();
+                }
             }
-        }
+        });
     }
 
-    private void configureButton() {
-        locationManager.requestLocationUpdates("gps", 5000, 0, locationListener);
+    private void requestPermissions() {
+        ActivityCompat.requestPermissions(this,new String[]{Manifest.permission.ACCESS_FINE_LOCATION},1);
     }
 }
